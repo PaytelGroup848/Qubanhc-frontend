@@ -94,6 +94,11 @@ const displayStock = selectedVariant?.stock ?? product.stock ?? 999;
         </div>
 
         <p className="text-sm text-gray-600">{product.description}</p>
+        {(product.unitsPerPack && product.unitsPerPack > 1) && (
+          <span className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full border border-teal-200 w-fit">
+            Pack of {product.unitsPerPack} pieces
+          </span>
+        )}
       </div>
 
       {/* Variants */}

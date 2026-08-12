@@ -22,6 +22,7 @@ export default function ProductCreate() {
     stock: 0,
     trackInventory: true,
     lowStockThreshold: 5,
+    unitsPerPack: 6,
     taxClass: 'gst_18',
     images: [],
     specifications: [{ label: '', value: '' }],
@@ -100,6 +101,28 @@ export default function ProductCreate() {
     setForm((prev) => ({ ...prev, tags }));
   };
 
+  const handleUnitsPerPackChange = (e) => {
+    const val = parseInt(e.target.value);
+    setForm((prev) => ({
+      ...prev,
+      unitsPerPack: isNaN(val) || val < 1 ? 1 : val,
+    }));
+  };
+
+  const incrementUnitsPerPack = () => {
+    setForm((prev) => ({
+      ...prev,
+      unitsPerPack: (prev.unitsPerPack || 1) + 1,
+    }));
+  };
+
+  const decrementUnitsPerPack = () => {
+    setForm((prev) => ({
+      ...prev,
+      unitsPerPack: Math.max(1, (prev.unitsPerPack || 1) - 1),
+    }));
+  };
+
   const validate = () => {
     if (!form.name.trim()) return 'Product name is required';
     if (!form.description.trim()) return 'Product description is required';
@@ -142,6 +165,7 @@ const handleSubmit = async (e) => {
       stock: parseInt(form.stock) || 0,
       trackInventory: form.trackInventory,
       lowStockThreshold: parseInt(form.lowStockThreshold) || 5,
+      unitsPerPack: parseInt(form.unitsPerPack) || 1,
       taxClass: form.taxClass,
       images: allImages,         // ← saari images
       specifications: form.specifications.filter((s) => s.label && s.value),
@@ -373,6 +397,36 @@ const handleSubmit = async (e) => {
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
                 placeholder="5"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Units per Pack</label>
+              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-transparent">
+                <button
+                  type="button"
+                  onClick={decrementUnitsPerPack}
+                  disabled={form.unitsPerPack <= 1}
+                  className="px-4 py-2.5 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed border-r border-gray-200 font-semibold transition-colors"
+                >
+                  −
+                </button>
+                <input
+                  type="number"
+                  name="unitsPerPack"
+                  value={form.unitsPerPack}
+                  onChange={handleUnitsPerPackChange}
+                  min="1"
+                  className="flex-1 px-4 py-2.5 text-center outline-none w-20"
+                />
+                <button
+                  type="button"
+                  onClick={incrementUnitsPerPack}
+                  className="px-4 py-2.5 text-gray-600 hover:bg-gray-50 border-l border-gray-200 font-semibold transition-colors"
+                >
+                  +
+                </button>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">How many pieces come in one packet (e.g. 6 or 8 during offers)</p>
             </div>
 
             <div className="flex items-center gap-3 pt-5">

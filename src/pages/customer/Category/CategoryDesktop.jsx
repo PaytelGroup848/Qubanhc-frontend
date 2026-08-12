@@ -1,20 +1,56 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronRight, Loader2, Sparkles } from 'lucide-react';
-import { categoryService } from '../../../services/category';
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { ArrowRight, ChevronRight, Loader2, Sparkles } from "lucide-react";
+import { categoryService } from "../../../services/category";
 
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
-  "http://localhost:5000" ||
+  // "http://localhost:5000" ||
   "https://qubanhygienecare.com";
 
 const fallbackCategories = [
-  { _id: 'adult-care', name: 'Adult Care', slug: 'adult-care', icon: '🛡️', productCount: 0 },
-  { _id: 'baby-care', name: 'Baby Care', slug: 'baby-care', icon: '👶', productCount: 0 },
-  { _id: 'hygiene-essentials', name: 'Hygiene Essentials', slug: 'hygiene-essentials', icon: '🧼', productCount: 0 },
-  { _id: 'sanitary-pads', name: 'Sanitary Pads', slug: 'sanitary-pads', icon: '🌸', productCount: 0 },
-  { _id: 'wellness', name: 'Wellness', slug: 'wellness', icon: '💚', productCount: 0 },
-  { _id: 'medical-supplies', name: 'Medical Supplies', slug: 'medical-supplies', icon: '🏥', productCount: 0 },
+  {
+    _id: "adult-care",
+    name: "Adult Care",
+    slug: "adult-care",
+    icon: "🛡️",
+    productCount: 0,
+  },
+  {
+    _id: "baby-care",
+    name: "Baby Care",
+    slug: "baby-care",
+    icon: "👶",
+    productCount: 0,
+  },
+  {
+    _id: "hygiene-essentials",
+    name: "Hygiene Essentials",
+    slug: "hygiene-essentials",
+    icon: "🧼",
+    productCount: 0,
+  },
+  {
+    _id: "sanitary-pads",
+    name: "Sanitary Pads",
+    slug: "sanitary-pads",
+    icon: "🌸",
+    productCount: 0,
+  },
+  {
+    _id: "wellness",
+    name: "Wellness",
+    slug: "wellness",
+    icon: "💚",
+    productCount: 0,
+  },
+  {
+    _id: "medical-supplies",
+    name: "Medical Supplies",
+    slug: "medical-supplies",
+    icon: "🏥",
+    productCount: 0,
+  },
 ];
 
 function extractPayload(response) {
@@ -30,19 +66,19 @@ function resolveImageUrl(category) {
     category?.image ||
     category?.thumbnail?.url ||
     category?.thumbnail ||
-    '';
+    "";
 
-  if (!raw || typeof raw !== 'string') return '';
+  if (!raw || typeof raw !== "string") return "";
 
   if (
-    raw.startsWith('http://') ||
-    raw.startsWith('https://') ||
-    raw.startsWith('data:')
+    raw.startsWith("http://") ||
+    raw.startsWith("https://") ||
+    raw.startsWith("data:")
   ) {
     return raw;
   }
 
-  if (raw.startsWith('/')) return `${BACKEND_URL}${raw}`;
+  if (raw.startsWith("/")) return `${BACKEND_URL}${raw}`;
 
   return `${BACKEND_URL}/uploads/categories/${raw}`;
 }
@@ -51,16 +87,19 @@ function normalizeCategory(category, index = 0) {
   return {
     ...category,
     _id: category?._id || category?.id || `category-${index}`,
-    name: category?.name || 'Category',
-    slug: category?.slug || category?._id || category?.id || `category-${index}`,
-    icon: category?.icon || '📦',
-    productCount: Number(category?.productCount || category?.productsCount || 0),
+    name: category?.name || "Category",
+    slug:
+      category?.slug || category?._id || category?.id || `category-${index}`,
+    icon: category?.icon || "📦",
+    productCount: Number(
+      category?.productCount || category?.productsCount || 0,
+    ),
     image: resolveImageUrl(category),
   };
 }
 
 export default function CategoryDesktop({
-  title = 'Shop by Category',
+  title = "Shop by Category",
   subtitle = "Find what you're looking for faster",
   limit = 6,
 }) {
@@ -86,13 +125,15 @@ export default function CategoryDesktop({
           setCategories(
             formatted.length > 0
               ? formatted.slice(0, limit)
-              : fallbackCategories.slice(0, limit).map(normalizeCategory)
+              : fallbackCategories.slice(0, limit).map(normalizeCategory),
           );
         }
       } catch (err) {
-        console.error('Error fetching featured categories:', err);
+        console.error("Error fetching featured categories:", err);
         if (alive) {
-          setCategories(fallbackCategories.slice(0, limit).map(normalizeCategory));
+          setCategories(
+            fallbackCategories.slice(0, limit).map(normalizeCategory),
+          );
         }
       } finally {
         if (alive) setLoading(false);
@@ -106,7 +147,10 @@ export default function CategoryDesktop({
     };
   }, [limit]);
 
-  const visibleCategories = useMemo(() => categories.slice(0, limit), [categories, limit]);
+  const visibleCategories = useMemo(
+    () => categories.slice(0, limit),
+    [categories, limit],
+  );
 
   if (loading) {
     return (

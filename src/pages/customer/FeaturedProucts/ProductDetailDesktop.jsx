@@ -505,6 +505,12 @@ export default function ProductDetailDesktop({
                   </p>
                 )}
                 <p className="text-xs text-gray-400">Inclusive of all taxes</p>
+                {(product.unitsPerPack && product.unitsPerPack > 1) && (
+                  <span className="inline-flex items-center gap-1.5 bg-teal-50 text-teal-700 text-xs font-bold px-3 py-1 rounded-full border border-teal-200 w-fit mt-1">
+                    <PackageCheck className="w-3 h-3" />
+                    Pack of {product.unitsPerPack} pieces
+                  </span>
+                )}
               </div>
 
               {/* Description */}
