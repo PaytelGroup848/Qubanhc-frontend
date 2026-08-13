@@ -572,7 +572,7 @@ export default function ProductDetailDesktop({
                   </span>
                   {displayOriginalPrice > displayPrice && (
                     <span className="text-base sm:text-lg text-gray-300 line-through font-medium">
-                      {formatPrice(displayOriginalPrice)}
+                      MRP {formatPrice(displayOriginalPrice)}
                     </span>
                   )}
                   {discountPercent > 0 && (
