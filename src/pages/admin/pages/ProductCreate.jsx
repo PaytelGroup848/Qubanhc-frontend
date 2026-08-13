@@ -1,37 +1,39 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { adminService } from '../../../services/admin';
-import ProductImageUpload from '../../../components/ProductImageUpload';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { adminService } from "../../../services/admin";
+import ProductImageUpload from "../../../components/ProductImageUpload";
+import toast from "react-hot-toast";
 
 export default function ProductCreate() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
-    name: '',
-    description: '',
-    shortDescription: '',
-    category: '',
-    subCategory: '',
-    brand: '',
-    price: '',
-    originalPrice: '',
+    name: "",
+    description: "",
+    shortDescription: "",
+    category: "",
+    subCategory: "",
+    brand: "",
+    price: "",
+    originalPrice: "",
     stock: 0,
     trackInventory: true,
     lowStockThreshold: 5,
     unitsPerPack: 6,
-    taxClass: 'gst_18',
+    taxClass: "gst_18",
     images: [],
-    specifications: [{ label: '', value: '' }],
+    specifications: [{ label: "", value: "" }],
     highlights: [],
     tags: [],
     isFeatured: false,
+    hasVariants: false,
+    variants: [{ name: "", price: "", stock: 0 }],
     seo: {
-      metaTitle: '',
-      metaDescription: '',
+      metaTitle: "",
+      metaDescription: "",
       keywords: [],
     },
   });
@@ -46,7 +48,7 @@ export default function ProductCreate() {
       const response = await adminService.getCategories();
       setCategories(response.data?.categories || []);
     } catch (err) {
-      console.error('Error fetching categories:', err);
+      console.error("Error fetching categories:", err);
       setCategories([]);
     } finally {
       setPageLoading(false);
@@ -56,8 +58,8 @@ export default function ProductCreate() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (name.startsWith('seo.')) {
-      const seoField = name.split('.')[1];
+    if (name.startsWith("seo.")) {
+      const seoField = name.split(".")[1];
       setForm((prev) => ({
         ...prev,
         seo: {
@@ -70,7 +72,7 @@ export default function ProductCreate() {
 
     setForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -87,7 +89,7 @@ export default function ProductCreate() {
   const addSpecification = () => {
     setForm((prev) => ({
       ...prev,
-      specifications: [...prev.specifications, { label: '', value: '' }],
+      specifications: [...prev.specifications, { label: "", value: "" }],
     }));
   };
 
@@ -97,7 +99,10 @@ export default function ProductCreate() {
   };
 
   const handleTagsChange = (e) => {
-    const tags = e.target.value.split(',').map((t) => t.trim()).filter((t) => t);
+    const tags = e.target.value
+      .split(",")
+      .map((t) => t.trim())
+      .filter((t) => t);
     setForm((prev) => ({ ...prev, tags }));
   };
 
@@ -123,74 +128,147 @@ export default function ProductCreate() {
     }));
   };
 
+  const addVariantRow = () => {
+    setForm((prev) => ({
+      ...prev,
+      variants: [
+        ...prev.variants,
+        { name: "", price: prev.price || "", stock: 0 },
+      ],
+    }));
+  };
+
+  const removeVariantRow = (index) => {
+    setForm((prev) => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleVariantChange = (index, field, value) => {
+    setForm((prev) => {
+      const newVariants = [...prev.variants];
+      newVariants[index][field] = value;
+      return { ...prev, variants: newVariants };
+    });
+  };
+
   const validate = () => {
-    if (!form.name.trim()) return 'Product name is required';
-    if (!form.description.trim()) return 'Product description is required';
-    if (!form.price || parseFloat(form.price) <= 0) return 'Valid price is required';
-    if (!form.category) return 'Category is required';
+    if (!form.name.trim()) return "Product name is required";
+    if (!form.description.trim()) return "Product description is required";
+    if (!form.category) return "Category is required";
+    if (!form.hasVariants) {
+      if (!form.price || parseFloat(form.price) <= 0)
+        return "Valid price is required";
+    } else {
+      const validVariants = form.variants.filter(
+        (v) => v.name && v.name.trim(),
+      );
+      if (validVariants.length === 0)
+        return "At least one size with name is required when sizes are enabled";
+      for (const v of validVariants) {
+        if (!v.price || parseFloat(v.price) <= 0)
+          return `Valid price required for size "${v.name}"`;
+        if (
+          v.stock === undefined ||
+          v.stock === null ||
+          parseInt(v.stock) < 0
+        ) {
+          return `Valid stock required for size "${v.name}"`;
+        }
+      }
+    }
     return null;
   };
 
-// ✅AISA KARO — saari images bhejo as-is
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const validationError = validate();
-  if (validationError) {
-    setError(validationError);
-    toast.error(validationError);
-    return;
-  }
-  setError('');
-  setLoading(true);
+  // ✅AISA KARO — saari images bhejo as-is
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      toast.error(validationError);
+      return;
+    }
+    setError("");
+    setLoading(true);
 
-  try {
-    // Saari images bhejo — base64 bhi
-    // Backend khud handle karega
-    const allImages = form.images.map((img, index) => ({
-      url: img.url,           // base64 ya normal URL dono
-      publicId: img.publicId || null,
-      isMain: img.isMain || index === 0,
-      displayOrder: index,
-    }));
+    try {
+      // Saari images bhejo — base64 bhi
+      // Backend khud handle karega
+      const allImages = form.images.map((img, index) => ({
+        url: img.url, // base64 ya normal URL dono
+        publicId: img.publicId || null,
+        isMain: img.isMain || index === 0,
+        displayOrder: index,
+      }));
 
-    const productData = {
-      name: form.name.trim(),
-      description: form.description.trim(),
-      shortDescription: form.shortDescription?.trim() || '',
-      category: form.category,
-      subCategory: form.subCategory || null,
-      brand: form.brand || null,
-      price: parseFloat(form.price),
-      originalPrice: form.originalPrice ? parseFloat(form.originalPrice) : null,
-      stock: parseInt(form.stock) || 0,
-      trackInventory: form.trackInventory,
-      lowStockThreshold: parseInt(form.lowStockThreshold) || 5,
-      unitsPerPack: parseInt(form.unitsPerPack) || 1,
-      taxClass: form.taxClass,
-      images: allImages,         // ← saari images
-      specifications: form.specifications.filter((s) => s.label && s.value),
-      highlights: form.highlights.filter((h) => h.trim()),
-      tags: form.tags,
-      isFeatured: form.isFeatured,
-      seo: {
-        metaTitle: form.seo.metaTitle?.trim() || '',
-        metaDescription: form.seo.metaDescription?.trim() || '',
-        keywords: form.seo.keywords?.filter((k) => k.trim()) || [],
-      },
-    };
+      const validVariants = form.hasVariants
+        ? form.variants
+            .filter((v) => v.name && v.name.trim())
+            .map((v) => ({
+              name: v.name.trim(),
+              price: parseFloat(v.price) || parseFloat(form.price) || 0,
+              originalPrice: form.originalPrice
+                ? parseFloat(form.originalPrice)
+                : null,
+              stock: parseInt(v.stock) || 0,
+              attributes: [{ name: "Size", value: v.name.trim() }],
+            }))
+        : [];
 
-    await adminService.createProduct(productData);
+      const basePrice =
+        form.hasVariants && validVariants.length
+          ? Math.min(...validVariants.map((v) => v.price))
+          : parseFloat(form.price);
 
-    toast.success('Product created successfully!');
-    navigate('/admin/products');
-  } catch (err) {
-    const message = err.response?.data?.message || 'Something went wrong';
-    setError(message);
-    toast.error(message);
-  } finally {
-    setLoading(false);
-  }
-};
+      const baseStock =
+        form.hasVariants && validVariants.length
+          ? validVariants.reduce((s, v) => s + v.stock, 0)
+          : parseInt(form.stock) || 0;
+
+      const productData = {
+        name: form.name.trim(),
+        description: form.description.trim(),
+        shortDescription: form.shortDescription?.trim() || "",
+        category: form.category,
+        subCategory: form.subCategory || null,
+        brand: form.brand || null,
+        price: basePrice,
+        originalPrice: form.originalPrice
+          ? parseFloat(form.originalPrice)
+          : null,
+        stock: baseStock,
+        trackInventory: form.trackInventory,
+        lowStockThreshold: parseInt(form.lowStockThreshold) || 5,
+        unitsPerPack: parseInt(form.unitsPerPack) || 1,
+        taxClass: form.taxClass,
+        images: allImages,
+        specifications: form.specifications.filter((s) => s.label && s.value),
+        highlights: form.highlights.filter((h) => h.trim()),
+        tags: form.tags,
+        isFeatured: form.isFeatured,
+        hasVariants: form.hasVariants && validVariants.length > 0,
+        variants: validVariants,
+        seo: {
+          metaTitle: form.seo.metaTitle?.trim() || "",
+          metaDescription: form.seo.metaDescription?.trim() || "",
+          keywords: form.seo.keywords?.filter((k) => k.trim()) || [],
+        },
+      };
+
+      await adminService.createProduct(productData);
+
+      toast.success("Product created successfully!");
+      navigate("/admin/products");
+    } catch (err) {
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (pageLoading) {
     return (
@@ -203,11 +281,21 @@ const handleSubmit = async (e) => {
   return (
     <div className="max-w-6xl mx-auto">
       <button
-        onClick={() => navigate('/admin/products')}
+        onClick={() => navigate("/admin/products")}
         className="flex items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors mb-6"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         Back to Products
       </button>
@@ -226,7 +314,9 @@ const handleSubmit = async (e) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* General Information */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-6">
-          <h2 className="text-lg font-semibold text-gray-800">General Information</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            General Information
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
@@ -259,7 +349,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Short Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Short Description
+              </label>
               <textarea
                 name="shortDescription"
                 value={form.shortDescription}
@@ -269,7 +361,9 @@ const handleSubmit = async (e) => {
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all resize-y"
                 placeholder="Brief product summary..."
               />
-              <p className="text-xs text-gray-400 mt-1">{form.shortDescription?.length || 0}/500 characters</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {form.shortDescription?.length || 0}/500 characters
+              </p>
             </div>
 
             <div>
@@ -292,7 +386,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Sub Category
+              </label>
               <select
                 name="subCategory"
                 value={form.subCategory}
@@ -309,7 +405,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Brand
+              </label>
               <input
                 type="text"
                 name="brand"
@@ -321,7 +419,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tax Class</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tax Class
+              </label>
               <select
                 name="taxClass"
                 value={form.taxClass}
@@ -340,7 +440,9 @@ const handleSubmit = async (e) => {
 
         {/* Pricing & Inventory */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-6">
-          <h2 className="text-lg font-semibold text-gray-800">Pricing & Inventory</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            Pricing & Inventory
+          </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
@@ -360,7 +462,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Original Price (₹)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Original Price (₹MRP)
+              </label>
               <input
                 type="number"
                 name="originalPrice"
@@ -369,12 +473,14 @@ const handleSubmit = async (e) => {
                 min="0"
                 step="0.01"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                placeholder="1299"
+                placeholder="0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Stock Quantity</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stock Quantity
+              </label>
               <input
                 type="number"
                 name="stock"
@@ -387,7 +493,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Low Stock Threshold</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Low Stock Threshold
+              </label>
               <input
                 type="number"
                 name="lowStockThreshold"
@@ -400,7 +508,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Units per Pack</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Units per Pack
+              </label>
               <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-transparent">
                 <button
                   type="button"
@@ -426,11 +536,15 @@ const handleSubmit = async (e) => {
                   +
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-1">How many pieces come in one packet (e.g. 6 or 8 during offers)</p>
+              <p className="text-xs text-gray-400 mt-1">
+                How many pieces come in one packet (e.g. 6 or 8 during offers)
+              </p>
             </div>
 
             <div className="flex items-center gap-3 pt-5">
-              <label className="text-sm font-medium text-gray-700">Track Inventory</label>
+              <label className="text-sm font-medium text-gray-700">
+                Track Inventory
+              </label>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
@@ -444,7 +558,9 @@ const handleSubmit = async (e) => {
             </div>
 
             <div className="flex items-center gap-3 pt-5">
-              <label className="text-sm font-medium text-gray-700">Featured Product</label>
+              <label className="text-sm font-medium text-gray-700">
+                Featured Product
+              </label>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
@@ -459,10 +575,119 @@ const handleSubmit = async (e) => {
           </div>
         </div>
 
+        {/* Sizes / Variants */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800">
+                Sizes & Quantity
+              </h2>
+              <p className="text-sm text-gray-500 mt-1">
+                Enable this for products with multiple sizes (e.g. diapers,
+                pads, apparel with S/M/L/XL/XXL)
+              </p>
+            </div>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <span className="text-sm font-medium text-gray-700">
+                Product has sizes
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="hasVariants"
+                  checked={form.hasVariants}
+                  onChange={handleChange}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-teal-600 peer-focus:ring-2 peer-focus:ring-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
+              </label>
+            </label>
+          </div>
+
+          {form.hasVariants && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-12 gap-3 text-xs font-semibold text-gray-400 uppercase tracking-wider px-1">
+                <div className="col-span-4">Size Name</div>
+                <div className="col-span-3">Price (₹)</div>
+                <div className="col-span-3">In Stock</div>
+                <div className="col-span-2" />
+              </div>
+
+              {form.variants.map((v, idx) => (
+                <div key={idx} className="grid grid-cols-12 gap-3 items-center">
+                  <div className="col-span-4">
+                    <input
+                      type="text"
+                      placeholder="e.g. S, M, L, XL, XXL, New Born"
+                      value={v.name}
+                      onChange={(e) =>
+                        handleVariantChange(idx, "name", e.target.value)
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                    />
+                  </div>
+                  <div className="col-span-3">
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder={String(form.price || "Price")}
+                      value={v.price}
+                      onChange={(e) =>
+                        handleVariantChange(idx, "price", e.target.value)
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                    />
+                  </div>
+                  <div className="col-span-3">
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="0"
+                      value={v.stock}
+                      onChange={(e) =>
+                        handleVariantChange(idx, "stock", e.target.value)
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                    />
+                  </div>
+                  <div className="col-span-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => removeVariantRow(idx)}
+                      disabled={form.variants.length <= 1}
+                      className="p-2.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={addVariantRow}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-teal-300 text-teal-600 hover:bg-teal-50 text-sm font-medium transition-colors"
+                >
+                  + Add Size
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-400 pt-2 border-t border-gray-100">
+                Leave Price empty to use base product price. Base product price
+                &amp; stock will automatically be calculated from the sizes.
+              </p>
+            </div>
+          )}
+        </div>
+
         {/* Product Images */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-6">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">Product Images</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Product Images
+            </h2>
             <p className="text-sm text-gray-500 mt-1">
               Upload product images. First image will be used as thumbnail.
             </p>
@@ -476,7 +701,7 @@ const handleSubmit = async (e) => {
 
           {form.images.length === 0 && (
             <p className="text-sm text-yellow-600">
-              ⚠️ At least one image is recommended for better visibility
+              At least one image is recommended for better visibility
             </p>
           )}
         </div>
@@ -484,7 +709,9 @@ const handleSubmit = async (e) => {
         {/* Specifications */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800">Specifications</h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              Specifications
+            </h2>
             <button
               type="button"
               onClick={addSpecification}
@@ -501,7 +728,9 @@ const handleSubmit = async (e) => {
                   type="text"
                   placeholder="Label (e.g., Material)"
                   value={spec.label}
-                  onChange={(e) => handleSpecificationChange(index, 'label', e.target.value)}
+                  onChange={(e) =>
+                    handleSpecificationChange(index, "label", e.target.value)
+                  }
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
                 />
               </div>
@@ -510,7 +739,9 @@ const handleSubmit = async (e) => {
                   type="text"
                   placeholder="Value (e.g., Cotton)"
                   value={spec.value}
-                  onChange={(e) => handleSpecificationChange(index, 'value', e.target.value)}
+                  onChange={(e) =>
+                    handleSpecificationChange(index, "value", e.target.value)
+                  }
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
                 />
               </div>
@@ -531,19 +762,25 @@ const handleSubmit = async (e) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tags
+              </label>
               <input
                 type="text"
-                value={form.tags.join(', ')}
+                value={form.tags.join(", ")}
                 onChange={handleTagsChange}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
                 placeholder="tag1, tag2, tag3"
               />
-              <p className="text-xs text-gray-400 mt-1">Separate tags with commas</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Separate tags with commas
+              </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Title
+              </label>
               <input
                 type="text"
                 name="seo.metaTitle"
@@ -553,11 +790,15 @@ const handleSubmit = async (e) => {
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
                 placeholder="Meta title"
               />
-              <p className="text-xs text-gray-400 mt-1">{form.seo.metaTitle?.length || 0}/60 characters</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {form.seo.metaTitle?.length || 0}/60 characters
+              </p>
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Description
+              </label>
               <textarea
                 name="seo.metaDescription"
                 value={form.seo.metaDescription}
@@ -567,7 +808,9 @@ const handleSubmit = async (e) => {
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all resize-y"
                 placeholder="Meta description"
               />
-              <p className="text-xs text-gray-400 mt-1">{form.seo.metaDescription?.length || 0}/160 characters</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {form.seo.metaDescription?.length || 0}/160 characters
+              </p>
             </div>
           </div>
         </div>
@@ -582,19 +825,31 @@ const handleSubmit = async (e) => {
             {loading ? (
               <>
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
                 Creating...
               </>
             ) : (
-              'Create Product'
+              "Create Product"
             )}
           </button>
 
           <button
             type="button"
-            onClick={() => navigate('/admin/products')}
+            onClick={() => navigate("/admin/products")}
             className="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
             Cancel

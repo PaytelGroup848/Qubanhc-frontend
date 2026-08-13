@@ -30,15 +30,13 @@ export default function ProductDetailPage() {
         const isMongoId = /^[a-f\d]{24}$/i.test(id);
 
         if (isMongoId) {
-          // _id se fetch karo
           response = await productService.getProductById(id);
         } else {
-          // slug se fetch karo
           response = await productService.getProductBySlug(id);
         }
 
-        setProduct(response.data.product);
-        setVariants(response.data.variants || []);
+        setProduct(response.product);
+        setVariants(response.variants || []);
       } catch (err) {
         console.error('Error fetching product:', err);
         setError('Product not found');
@@ -55,14 +53,21 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = async () => {
     try {
+      const hasSizes = variants && variants.length > 0;
+      if (hasSizes && !selectedVariant) {
+        toast.error('Please select a size first');
+        return;
+      }
       const productId = product._id;
       const variantId = selectedVariant?._id || null;
+      const displayPrice = selectedVariant?.price || product.price;
+      const displayOriginalPrice = selectedVariant?.originalPrice || product.originalPrice;
       addToCart(
         {
           id: productId,
           name: product.name,
-          price: selectedVariant?.price || product.price,
-          originalPrice: selectedVariant?.originalPrice || product.originalPrice,
+          price: displayPrice,
+          originalPrice: displayOriginalPrice,
           image: product.images?.[0]?.url || '/images/placeholder.jpg',
           variantName: selectedVariant?.name || selectedVariant?.title || null,
         },
@@ -76,6 +81,11 @@ export default function ProductDetailPage() {
   };
 
   const handleBuyNow = async () => {
+    const hasSizes = variants && variants.length > 0;
+    if (hasSizes && !selectedVariant) {
+      toast.error('Please select a size first');
+      return;
+    }
     await handleAddToCart();
     navigate('/cart');
   };

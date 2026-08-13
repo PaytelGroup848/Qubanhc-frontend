@@ -1,4 +1,5 @@
 import api from './api';
+import { unwrapApiData, unwrapProductDetail } from '../utils/apiResponse';
 
 export const productService = {
   // Get all products with filters
@@ -17,13 +18,13 @@ export const productService = {
   // Get product by slug
   getProductBySlug: async (slug) => {
     const response = await api.get(`/products/slug/${slug}`);
-    return response.data;
+    return unwrapProductDetail(response.data);
   },
 
   // Get product by ID
   getProductById: async (id) => {
     const response = await api.get(`/products/${id}`);
-    return response.data;
+    return unwrapProductDetail(response.data);
   },
 
   // Search products

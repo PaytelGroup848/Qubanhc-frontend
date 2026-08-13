@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { getImageUrl } from '../../../utils/imageUrl';
+import { useState } from "react";
+import { getImageUrl } from "../../../utils/imageUrl";
 
 export default function ImageGallery({ images, isMobile }) {
   const [mainImage, setMainImage] = useState(images?.[0] || null);
@@ -19,7 +19,9 @@ export default function ImageGallery({ images, isMobile }) {
   return (
     <div className="flex flex-col-reverse md:flex-row gap-4">
       {/* Thumbnails */}
-      <div className={`flex ${isMobile ? 'flex-row' : 'flex-col'} gap-2.5 overflow-x-auto md:overflow-y-auto md:max-h-[520px] pr-1`}>
+      <div
+        className={`flex ${isMobile ? "flex-row" : "flex-col"} gap-2.5 overflow-x-auto md:overflow-y-auto md:max-h-[520px] pr-1`}
+      >
         {images.map((img, idx) => {
           const active = mainImage === img;
           return (
@@ -29,8 +31,8 @@ export default function ImageGallery({ images, isMobile }) {
               aria-label={`View image ${idx + 1}`}
               className={`w-16 h-16 rounded-xl overflow-hidden border-2 transition-all duration-200 flex-shrink-0 bg-slate-50 ${
                 active
-                  ? 'border-emerald-500 shadow-md shadow-emerald-100'
-                  : 'border-slate-200 hover:border-emerald-300 opacity-70 hover:opacity-100'
+                  ? "border-emerald-500 shadow-md shadow-emerald-100"
+                  : "border-slate-200 hover:border-emerald-300 opacity-70 hover:opacity-100"
               }`}
             >
               <img
@@ -44,7 +46,7 @@ export default function ImageGallery({ images, isMobile }) {
       </div>
 
       {/* Main image */}
-      <div className="flex-1 aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100">
+      <div className="flex-1 mt-[15%] aspect-square bg-slate-50 rounded-2xl overflow-hidden border border-slate-100">
         <img
           src={getImageUrl(mainImage?.url || mainImage)}
           alt="Product"

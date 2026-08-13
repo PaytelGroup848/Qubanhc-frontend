@@ -1,4 +1,5 @@
 import api from './api';
+import { unwrapApiData, unwrapProductDetail } from '../utils/apiResponse';
 
 export const adminService = {
   // ==================== DASHBOARD ====================
@@ -42,12 +43,12 @@ export const adminService = {
   getAllProducts: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
     const response = await api.get(`/products${queryParams ? `?${queryParams}` : ''}`);
-    return response.data;
+    return unwrapApiData(response.data);
   },
 
   getProductById: async (id) => {
     const response = await api.get(`/products/${id}`);
-    return response.data;
+    return unwrapProductDetail(response.data);
   },
 
   createProduct: async (data) => {
