@@ -24,9 +24,7 @@ const emptyForm = {
   tags: [],
   isFeatured: false,
   hasVariants: false,
-  variants: [
-    { name: "", price: "", stock: 0 },
-  ],
+  variants: [{ name: "", price: "", stock: 0 }],
   seo: {
     metaTitle: "",
     metaDescription: "",
@@ -157,7 +155,10 @@ export default function Products() {
           existingVariants && existingVariants.length
             ? existingVariants.map((v) => ({
                 name: v.name || "",
-                price: v.price !== undefined && v.price !== null ? String(v.price) : "",
+                price:
+                  v.price !== undefined && v.price !== null
+                    ? String(v.price)
+                    : "",
                 stock: v.stock ?? 0,
               }))
             : [{ name: "", price: "", stock: 0 }],
@@ -264,7 +265,10 @@ export default function Products() {
   const addEditVariantRow = () => {
     setEditForm((prev) => ({
       ...prev,
-      variants: [...prev.variants, { name: "", price: prev.price || "", stock: 0 }],
+      variants: [
+        ...prev.variants,
+        { name: "", price: prev.price || "", stock: 0 },
+      ],
     }));
   };
 
@@ -299,11 +303,7 @@ export default function Products() {
       for (const v of validVariants) {
         if (!v.price || parseFloat(v.price) <= 0)
           return `Valid price required for size "${v.name}"`;
-        if (
-          v.stock === undefined ||
-          v.stock === null ||
-          parseInt(v.stock) < 0
-        )
+        if (v.stock === undefined || v.stock === null || parseInt(v.stock) < 0)
           return `Valid stock required for size "${v.name}"`;
       }
     }
@@ -343,13 +343,15 @@ export default function Products() {
             }))
         : [];
 
-      const basePrice = editForm.hasVariants && validVariants.length
-        ? Math.min(...validVariants.map((v) => v.price))
-        : parseFloat(editForm.price);
+      const basePrice =
+        editForm.hasVariants && validVariants.length
+          ? Math.min(...validVariants.map((v) => v.price))
+          : parseFloat(editForm.price);
 
-      const baseStock = editForm.hasVariants && validVariants.length
-        ? validVariants.reduce((s, v) => s + v.stock, 0)
-        : parseInt(editForm.stock) || 0;
+      const baseStock =
+        editForm.hasVariants && validVariants.length
+          ? validVariants.reduce((s, v) => s + v.stock, 0)
+          : parseInt(editForm.stock) || 0;
 
       const productData = {
         name: editForm.name.trim(),
@@ -974,8 +976,8 @@ export default function Products() {
                           Sizes &amp; Quantity
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">
-                          Enable for products with multiple sizes (diapers, pads,
-                          S/M/L/XL/XXL etc.)
+                          Enable for products with multiple sizes (diapers,
+                          pads, S/M/L/XL/XXL etc.)
                         </p>
                       </div>
                       <label className="flex items-center gap-3 cursor-pointer">
@@ -1097,7 +1099,7 @@ export default function Products() {
                     <ProductImageUpload
                       images={editForm.images}
                       onChange={handleEditImagesChange}
-                      maxImages={5}
+                      maxImages={10}
                     />
                   </div>
 

@@ -4,7 +4,7 @@ import { X, Upload, Star } from 'lucide-react';
 export default function ProductImageUpload({ 
   images = [], 
   onChange, 
-  maxImages = 5,
+  maxImages = 10,
   productId = null,
 }) {
   const [uploading, setUploading] = useState(false);

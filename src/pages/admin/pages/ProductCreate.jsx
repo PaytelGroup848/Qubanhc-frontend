@@ -696,7 +696,7 @@ export default function ProductCreate() {
           <ProductImageUpload
             images={form.images}
             onChange={handleImagesChange}
-            maxImages={5}
+            maxImages={10}
           />
 
           {form.images.length === 0 && (
