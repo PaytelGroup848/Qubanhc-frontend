@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import useNavbar from './useNavbar';
-import TopBar from './TopBar';
-import MobileMenu from './MobileMenu';
-import SearchBar from './SearchBar';
-import { SearchIcon, CartIcon, MenuIcon, CloseIcon } from '../Icons/Icons';
-import { useCart } from '../../context/CartContext';
-import { categoryService } from '../../services/category';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import useNavbar from "./useNavbar";
+import TopBar from "./TopBar";
+import MobileMenu from "./MobileMenu";
+import SearchBar from "./SearchBar";
+import { SearchIcon, CartIcon, MenuIcon, CloseIcon } from "../Icons/Icons";
+import { useCart } from "../../context/CartContext";
+import { categoryService } from "../../services/category";
 
 export default function MobileNavbar() {
   const {
@@ -29,21 +29,23 @@ export default function MobileNavbar() {
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
 
-  const isAdminUser = role === 'super_admin' || role === 'sub_admin';
-  const isVendorUser = role === 'vendor';
-  const dashboardLink = isVendorUser ? '/vendor/dashboard' : '/admin/dashboard';
-  const dashboardLabel = isVendorUser ? 'Go to Vendor Dashboard' : 'Go to Admin Panel';
+  const isAdminUser = role === "super_admin" || role === "sub_admin";
+  const isVendorUser = role === "vendor";
+  const dashboardLink = isVendorUser ? "/vendor/dashboard" : "/admin/dashboard";
+  const dashboardLabel = isVendorUser
+    ? "Go to Vendor Dashboard"
+    : "Go to Admin Panel";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen ? 'hidden' : '';
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
 
@@ -58,10 +60,10 @@ export default function MobileNavbar() {
           backendCategories.map((category) => ({
             id: category._id,
             title: category.name,
-            image: category.image?.url || '/images/placeholder.jpg',
+            image: category.image?.url || "/images/placeholder.jpg",
             link: `/category/${category.slug}`,
             children: category.children || [],
-          }))
+          })),
         );
       } catch (error) {
         setCategories([]);
@@ -79,7 +81,7 @@ export default function MobileNavbar() {
 
       <nav
         className={`sticky top-0 z-50 bg-white transition-all duration-300 ${
-          scrolled ? 'shadow-md' : 'shadow-sm'
+          scrolled ? "shadow-md" : "shadow-sm"
         }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between h-14 sm:h-16 gap-3">
@@ -104,14 +106,14 @@ export default function MobileNavbar() {
               alt="QubanHC Logo"
               className="h-8 sm:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <span className="text-lg sm:text-xl font-extrabold tracking-tight leading-none bg-gradient-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">
                 QubanHC
               </span>
               <span className="text-[9px] sm:text-[10px] font-medium text-gray-500 tracking-widest uppercase">
                 Care & Comfort
               </span>
-            </div>
+            </div> */}
           </Link>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -156,7 +158,7 @@ export default function MobileNavbar() {
                   key={cartCount}
                   className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1"
                 >
-                  {cartCount > 99 ? '99+' : cartCount}
+                  {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}
             </Link>
@@ -166,8 +168,8 @@ export default function MobileNavbar() {
         <div
           className={`overflow-hidden transition-all duration-300 ease-in-out ${
             mobileSearchOpen
-              ? 'max-h-24 py-3 px-3 sm:px-4'
-              : 'max-h-0 py-0 px-3 sm:px-4'
+              ? "max-h-24 py-3 px-3 sm:px-4"
+              : "max-h-0 py-0 px-3 sm:px-4"
           }`}
         >
           <SearchBar

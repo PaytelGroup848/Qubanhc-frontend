@@ -6,8 +6,9 @@ import toast from "react-hot-toast";
 import { categoryService } from "../../services/category";
 
 const BACKEND_URL =
-  import.meta.env.VITE_BACKEND_URL || "https://qubanhygienecare.com";
-// "http://localhost:5000";
+  import.meta.env.VITE_BACKEND_URL ||
+  "http://localhost:5000" ||
+  "https://qubanhygienecare.com";
 
 const fallbackCategories = [
   {

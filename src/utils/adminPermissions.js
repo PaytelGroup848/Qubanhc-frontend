@@ -1,37 +1,43 @@
 export const ADMIN_MODULES = [
   {
-    id: 'categories',
-    label: 'Categories',
-    path: '/admin/categories',
+    id: "categories",
+    label: "Categories",
+    path: "/admin/categories",
   },
   {
-    id: 'products',
-    label: 'Products',
-    path: '/admin/products',
+    id: "products",
+    label: "Products",
+    path: "/admin/products",
   },
   {
-    id: 'orders',
-    label: 'Orders',
-    path: '/admin/orders',
+    id: "orders",
+    label: "Orders",
+    path: "/admin/orders",
   },
   {
-    id: 'customers',
-    label: 'Customers',
-    path: '/admin/customers',
+    id: "customers",
+    label: "Customers",
+    path: "/admin/customers",
   },
   {
-    id: 'support',
-    label: 'Support',
-    path: '/admin/support',
+    id: "support",
+    label: "Support",
+    path: "/admin/support",
+  },
+  {
+    id: "get_in_touch",
+    label: "Get in Touch",
+    path: "/admin/get-in-touch",
   },
 ];
 
 export const ADMIN_MODULE_ORDER = [
-  'categories',
-  'products',
-  'orders',
-  'customers',
-  'support',
+  "categories",
+  "products",
+  "orders",
+  "customers",
+  "support",
+  "get_in_touch",
 ];
 
 export const getUserPermissions = (user) => {

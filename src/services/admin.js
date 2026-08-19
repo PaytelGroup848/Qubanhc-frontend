@@ -1,16 +1,16 @@
-import api from './api';
-import { unwrapApiData, unwrapProductDetail } from '../utils/apiResponse';
+import api from "./api";
+import { unwrapApiData, unwrapProductDetail } from "../utils/apiResponse";
 
 export const adminService = {
   // ==================== DASHBOARD ====================
   getDashboardStats: async () => {
-    const response = await api.get('/admin/dashboard');
+    const response = await api.get("/admin/dashboard");
     return response.data;
   },
 
   // ==================== CATEGORIES ====================
   getCategories: async () => {
-    const response = await api.get('/categories/admin/all');
+    const response = await api.get("/categories/admin/all");
     return response.data;
   },
 
@@ -20,7 +20,7 @@ export const adminService = {
   },
 
   createCategory: async (data) => {
-    const response = await api.post('/categories', data);
+    const response = await api.post("/categories", data);
     return response.data;
   },
 
@@ -42,7 +42,9 @@ export const adminService = {
   // ==================== PRODUCTS ====================
   getAllProducts: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    const response = await api.get(`/products${queryParams ? `?${queryParams}` : ''}`);
+    const response = await api.get(
+      `/products${queryParams ? `?${queryParams}` : ""}`,
+    );
     return unwrapApiData(response.data);
   },
 
@@ -52,7 +54,7 @@ export const adminService = {
   },
 
   createProduct: async (data) => {
-    const response = await api.post('/products', data);
+    const response = await api.post("/products", data);
     return response.data;
   },
 
@@ -100,7 +102,9 @@ export const adminService = {
   // ==================== VENDORS ====================
   getVendors: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    const response = await api.get(`/admin/vendors${queryParams ? `?${queryParams}` : ''}`);
+    const response = await api.get(
+      `/admin/vendors${queryParams ? `?${queryParams}` : ""}`,
+    );
     return response.data;
   },
 
@@ -110,7 +114,7 @@ export const adminService = {
   },
 
   createVendor: async (data) => {
-    const response = await api.post('/admin/vendors', data);
+    const response = await api.post("/admin/vendors", data);
     return response.data;
   },
 
@@ -137,7 +141,9 @@ export const adminService = {
   // ==================== USERS ====================
   getUsers: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    const response = await api.get(`/admin/users${queryParams ? `?${queryParams}` : ''}`);
+    const response = await api.get(
+      `/admin/users${queryParams ? `?${queryParams}` : ""}`,
+    );
     return response.data;
   },
 
@@ -147,7 +153,7 @@ export const adminService = {
   },
 
   createUser: async (data) => {
-    const response = await api.post('/admin/users', data);
+    const response = await api.post("/admin/users", data);
     return response.data;
   },
 
@@ -166,7 +172,7 @@ export const adminService = {
     const queryParams = new URLSearchParams(params).toString();
 
     const response = await api.get(
-      `/orders/admin/all${queryParams ? `?${queryParams}` : ''}`
+      `/orders/admin/all${queryParams ? `?${queryParams}` : ""}`,
     );
 
     return response.data;
@@ -177,7 +183,7 @@ export const adminService = {
     return response.data;
   },
 
-  updateOrderStatus: async (id, status, reason = '') => {
+  updateOrderStatus: async (id, status, reason = "") => {
     const response = await api.patch(`/orders/admin/${id}/status`, {
       status,
       reason,
@@ -191,11 +197,12 @@ export const adminService = {
     return response.data;
   },
 
-
   // ==================== COUPONS ====================
   getCoupons: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    const response = await api.get(`/coupons${queryParams ? `?${queryParams}` : ''}`);
+    const response = await api.get(
+      `/coupons${queryParams ? `?${queryParams}` : ""}`,
+    );
     return response.data;
   },
 
@@ -205,7 +212,7 @@ export const adminService = {
   },
 
   createCoupon: async (data) => {
-    const response = await api.post('/coupons', data);
+    const response = await api.post("/coupons", data);
     return response.data;
   },
 
@@ -226,40 +233,41 @@ export const adminService = {
 
   // ==================== SETTINGS ====================
   getSettings: async () => {
-    const response = await api.get('/settings');
+    const response = await api.get("/settings");
     return response.data;
   },
 
   updateSettings: async (settingsData) => {
-    const response = await api.put('/settings', settingsData);
+    const response = await api.put("/settings", settingsData);
     return response.data;
   },
 
-
   updateOrderSettings: async (data) => {
-    const response = await api.put('/admin/settings/order', data);
+    const response = await api.put("/admin/settings/order", data);
     return response.data;
   },
 
   updateTaxSettings: async (data) => {
-    const response = await api.put('/settings/tax', data);
+    const response = await api.put("/settings/tax", data);
     return response.data;
   },
 
   getCommissionSettings: async () => {
-    const response = await api.get('/settings/commission');
+    const response = await api.get("/settings/commission");
     return response.data;
   },
 
   updateCommissionSettings: async (data) => {
-    const response = await api.put('/settings/commission', data);
+    const response = await api.put("/settings/commission", data);
     return response.data;
   },
 
   // ==================== REPORTS ====================
   getReports: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    const response = await api.get(`/admin/reports${queryParams ? `?${queryParams}` : ''}`);
+    const response = await api.get(
+      `/admin/reports${queryParams ? `?${queryParams}` : ""}`,
+    );
     return response.data;
   },
 
@@ -270,11 +278,11 @@ export const adminService = {
   },
 
   getOrderStats: async () => {
-    const response = await api.get('/admin/orders/stats');
+    const response = await api.get("/admin/orders/stats");
     return response.data;
   },
 
-  getRevenueStats: async (period = 'month') => {
+  getRevenueStats: async (period = "month") => {
     const response = await api.get(`/admin/reports/revenue?period=${period}`);
     return response.data;
   },
@@ -282,7 +290,9 @@ export const adminService = {
   // ==================== VENDOR WITHDRAWALS ====================
   getWithdrawals: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    const response = await api.get(`/admin/withdrawals${queryParams ? `?${queryParams}` : ''}`);
+    const response = await api.get(
+      `/admin/withdrawals${queryParams ? `?${queryParams}` : ""}`,
+    );
     return response.data;
   },
 
@@ -292,25 +302,29 @@ export const adminService = {
   },
 
   rejectWithdrawal: async (id, reason) => {
-    const response = await api.put(`/admin/withdrawals/${id}/reject`, { reason });
+    const response = await api.put(`/admin/withdrawals/${id}/reject`, {
+      reason,
+    });
     return response.data;
   },
 
   // ==================== SYSTEM LOGS ====================
   getLogs: async (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    const response = await api.get(`/admin/logs${queryParams ? `?${queryParams}` : ''}`);
+    const response = await api.get(
+      `/admin/logs${queryParams ? `?${queryParams}` : ""}`,
+    );
     return response.data;
   },
 
   // ==================== BACKUP ====================
   createBackup: async () => {
-    const response = await api.post('/admin/backup');
+    const response = await api.post("/admin/backup");
     return response.data;
   },
 
   getBackups: async () => {
-    const response = await api.get('/admin/backups');
+    const response = await api.get("/admin/backups");
     return response.data;
   },
 
@@ -319,42 +333,71 @@ export const adminService = {
     return response.data;
   },
 
+  // ==================== SUPPORT ====================
+  getSupportStats: async () => {
+    const response = await api.get("/support/admin/stats");
+    return response.data;
+  },
 
-// ==================== SUPPORT ====================
-getSupportStats: async () => {
-  const response = await api.get('/support/admin/stats');
-  return response.data;
-},
+  getSupportTickets: async (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
 
-getSupportTickets: async (params = {}) => {
-  const queryParams = new URLSearchParams(params).toString();
+    const response = await api.get(
+      `/support${queryParams ? `?${queryParams}` : ""}`,
+    );
 
-  const response = await api.get(
-    `/support${queryParams ? `?${queryParams}` : ''}`
-  );
+    return response.data;
+  },
 
-  return response.data;
-},
+  getSupportTicketById: async (id) => {
+    const response = await api.get(`/support/${id}`);
+    return response.data;
+  },
 
-getSupportTicketById: async (id) => {
-  const response = await api.get(`/support/${id}`);
-  return response.data;
-},
+  replySupportTicket: async (id, data) => {
+    const response = await api.post(`/support/${id}/reply`, data);
+    return response.data;
+  },
 
-replySupportTicket: async (id, data) => {
-  const response = await api.post(`/support/${id}/reply`, data);
-  return response.data;
-},
+  updateSupportTicket: async (id, data) => {
+    const response = await api.patch(`/support/${id}`, data);
+    return response.data;
+  },
 
-updateSupportTicket: async (id, data) => {
-  const response = await api.patch(`/support/${id}`, data);
-  return response.data;
-},
+  deleteSupportTicket: async (id) => {
+    const response = await api.delete(`/support/${id}`);
+    return response.data;
+  },
 
-deleteSupportTicket: async (id) => {
-  const response = await api.delete(`/support/${id}`);
-  return response.data;
-},
+  // ==================== GET IN TOUCH / CONTACT ====================
+  getContactStats: async () => {
+    const response = await api.get("/contact/admin/stats");
+    return response.data;
+  },
 
+  getContactQueries: async (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+
+    const response = await api.get(
+      `/contact${queryParams ? `?${queryParams}` : ""}`,
+    );
+
+    return response.data;
+  },
+
+  getContactQueryById: async (id) => {
+    const response = await api.get(`/contact/${id}`);
+    return response.data;
+  },
+
+  updateContactQuery: async (id, data) => {
+    const response = await api.patch(`/contact/${id}`, data);
+    return response.data;
+  },
+
+  deleteContactQuery: async (id) => {
+    const response = await api.delete(`/contact/${id}`);
+    return response.data;
+  },
 };
 export default adminService;

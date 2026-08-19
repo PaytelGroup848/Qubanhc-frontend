@@ -1,34 +1,35 @@
-import { lazy, Suspense } from 'react';
-import { Navigate, Routes, Route, useLocation } from 'react-router-dom';
+import { lazy, Suspense } from "react";
+import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 
-import AdminLayout from './AdminLayout';
-import { authService } from '../../services/auth';
+import AdminLayout from "./AdminLayout";
+import { authService } from "../../services/auth";
 import {
   canAccessModule,
   getFirstAllowedAdminPath,
   getModuleByPath,
   isSuperAdmin,
   isSubAdmin,
-} from '../../utils/adminAccess';
+} from "../../utils/adminAccess";
 
-import SettingsPage from './pages/settings/SettingsPage';
-import InvoicePage from '../../components/invoice/invoice';
-import OrderDetails from './pages/orderDetails';
-import Support from './pages/support';
+import SettingsPage from "./pages/settings/SettingsPage";
+import InvoicePage from "../../components/invoice/invoice";
+import OrderDetails from "./pages/orderDetails";
+import Support from "./pages/support";
+import GetInTouch from "./pages/getInTouch";
 
-const AdminLogin = lazy(() => import('./AdminLogin'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
-const SubAdmins = lazy(() => import('./pages/SubAdmins'));
-const SubAdminCreate = lazy(() => import('./pages/SubAdminCreate'));
-const Products = lazy(() => import('./pages/Products'));
-const ProductCreate = lazy(() => import('./pages/ProductCreate'));
-const Orders = lazy(() => import('./pages/Orders'));
-const Customers = lazy(() => import('./pages/Customer'));
-const Categories = lazy(() => import('./pages/Category'));
-const CategoryCreate = lazy(() => import('./pages/CategoryCreate'));
-const Reports = lazy(() => import('./pages/Reports'));
-const Coupons = lazy(() => import('./pages/Coupons'));
-const CouponCreate = lazy(() => import('./pages/CouponCreate'));
+const AdminLogin = lazy(() => import("./AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const SubAdmins = lazy(() => import("./pages/SubAdmins"));
+const SubAdminCreate = lazy(() => import("./pages/SubAdminCreate"));
+const Products = lazy(() => import("./pages/Products"));
+const ProductCreate = lazy(() => import("./pages/ProductCreate"));
+const Orders = lazy(() => import("./pages/Orders"));
+const Customers = lazy(() => import("./pages/Customer"));
+const Categories = lazy(() => import("./pages/Category"));
+const CategoryCreate = lazy(() => import("./pages/CategoryCreate"));
+const Reports = lazy(() => import("./pages/Reports"));
+const Coupons = lazy(() => import("./pages/Coupons"));
+const CouponCreate = lazy(() => import("./pages/CouponCreate"));
 
 function NoAccess() {
   return (
@@ -217,6 +218,15 @@ export default function AdminRoutes() {
             element={
               <ModuleGuard moduleId="support">
                 <Support />
+              </ModuleGuard>
+            }
+          />
+
+          <Route
+            path="get-in-touch"
+            element={
+              <ModuleGuard moduleId="get_in_touch">
+                <GetInTouch />
               </ModuleGuard>
             }
           />

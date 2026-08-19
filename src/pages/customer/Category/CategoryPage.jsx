@@ -25,8 +25,8 @@ import { useCart } from "../../../context/CartContext";
 
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
-  // "http://localhost:5000"
-  "https://qubanhygienecare.com";
+  "http://localhost:5000"
+  // "https://qubanhygienecare.com";
 
 function formatPrice(amount) {
   return new Intl.NumberFormat("en-IN", {

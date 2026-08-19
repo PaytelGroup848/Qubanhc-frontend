@@ -1,15 +1,17 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
-import { Mail, Phone, MapPin, Clock, Send, Loader2 } from 'lucide-react';
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { Mail, Phone, MapPin, Clock, Send, Loader2 } from "lucide-react";
+import contactService from "../../services/contact";
+
 
 export default function ContactUs() {
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: 'general',
-    message: '',
+    name: "",
+    email: "",
+    phone: "",
+    subject: "general",
+    message: "",
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -20,10 +22,10 @@ export default function ContactUs() {
   };
 
   const validate = () => {
-    if (!form.name.trim()) return 'Name is required.';
+    if (!form.name.trim()) return "Name is required.";
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      return 'A valid email is required.';
-    if (!form.message.trim()) return 'Message is required.';
+      return "A valid email is required.";
+    if (!form.message.trim()) return "Message is required.";
     return null;
   };
 
@@ -36,14 +38,28 @@ export default function ContactUs() {
     }
 
     setLoading(true);
-    // Simulate API call
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success('Message sent successfully!');
+      await contactService.submitQuery({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        subject: form.subject,
+        message: form.message.trim(),
+      });
+      toast.success("Message sent successfully!");
       setSubmitted(true);
-      setForm({ name: '', email: '', phone: '', subject: 'general', message: '' });
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        subject: "general",
+        message: "",
+      });
     } catch (err) {
-      toast.error('Something went wrong. Please try again.');
+      toast.error(
+        err?.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -71,7 +87,9 @@ export default function ContactUs() {
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-100 text-teal-600 mb-4">
               <Send className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Message Sent!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Message Sent!
+            </h2>
             <p className="text-gray-500 mb-6">
               Thank you for reaching out. Our team will respond within 24 hours.
             </p>
@@ -88,7 +106,9 @@ export default function ContactUs() {
             {/* Left side – Contact Form */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
-                <h2 className="text-xl font-semibold text-gray-800 mb-6">Send us a Message</h2>
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  Send us a Message
+                </h2>
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -191,12 +211,16 @@ export default function ContactUs() {
             <div className="space-y-6">
               {/* Contact Info Card */}
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
-                <h2 className="text-xl font-semibold text-gray-800 mb-6">Contact Information</h2>
+                <h2 className="text-xl font-semibold text-gray-800 mb-6">
+                  Contact Information
+                </h2>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <MapPin className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Our Office</p>
+                      <p className="text-sm font-medium text-gray-800">
+                        Our Office
+                      </p>
                       <p className="text-sm text-gray-500">
                         123 QubanHC Tower, Sector 62, Noida, UP 201309, India
                       </p>
@@ -206,7 +230,10 @@ export default function ContactUs() {
                     <Phone className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-gray-800">Phone</p>
-                      <a href="tel:+9118001234567" className="text-sm text-gray-500 hover:text-teal-600">
+                      <a
+                        href="tel:+9118001234567"
+                        className="text-sm text-gray-500 hover:text-teal-600"
+                      >
                         1800-123-4567
                       </a>
                     </div>
@@ -215,7 +242,10 @@ export default function ContactUs() {
                     <Mail className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-sm font-medium text-gray-800">Email</p>
-                      <a href="mailto:support@qubanhc.com" className="text-sm text-gray-500 hover:text-teal-600">
+                      <a
+                        href="mailto:support@qubanhc.com"
+                        className="text-sm text-gray-500 hover:text-teal-600"
+                      >
                         support@qubanhc.com
                       </a>
                     </div>
@@ -223,9 +253,12 @@ export default function ContactUs() {
                   <li className="flex items-start gap-3">
                     <Clock className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-sm font-medium text-gray-800">Working Hours</p>
+                      <p className="text-sm font-medium text-gray-800">
+                        Working Hours
+                      </p>
                       <p className="text-sm text-gray-500">
-                        Monday – Saturday: 9:00 AM – 7:00 PM<br />
+                        Monday – Saturday: 9:00 AM – 7:00 PM
+                        <br />
                         Sunday: Closed
                       </p>
                     </div>
@@ -238,7 +271,9 @@ export default function ContactUs() {
                 <div className="aspect-video bg-gray-200 flex items-center justify-center">
                   <div className="text-center p-4">
                     <MapPin className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">Interactive map coming soon</p>
+                    <p className="text-sm text-gray-500">
+                      Interactive map coming soon
+                    </p>
                   </div>
                 </div>
               </div>

@@ -1,14 +1,20 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import useNavbar from './useNavbar';
-import TopBar from './TopBar';
-import ShopPopup from './ShopPopup';
-import SearchBar from './SearchBar';
-import ProfileDropdown from './ProfileDropdown';
-import MobileMenu from './MobileMenu';
-import { SearchIcon, WishlistIcon, CartIcon, MenuIcon, CloseIcon } from '../Icons/Icons';
-import { useCart } from '../../context/CartContext';
-import { categoryService } from '../../services/category';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
+import useNavbar from "./useNavbar";
+import TopBar from "./TopBar";
+import ShopPopup from "./ShopPopup";
+import SearchBar from "./SearchBar";
+import ProfileDropdown from "./ProfileDropdown";
+import MobileMenu from "./MobileMenu";
+import {
+  SearchIcon,
+  WishlistIcon,
+  CartIcon,
+  MenuIcon,
+  CloseIcon,
+} from "../Icons/Icons";
+import { useCart } from "../../context/CartContext";
+import { categoryService } from "../../services/category";
 
 export default function Navbar() {
   const {
@@ -31,7 +37,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [shopPopupOpen, setShopPopupOpen] = useState(false);
   const [shopCategories, setShopCategories] = useState([]);
-const [shopCategoriesLoading, setShopCategoriesLoading] = useState(false);
+  const [shopCategoriesLoading, setShopCategoriesLoading] = useState(false);
 
   const openTimeoutRef = useRef(null);
   const closeTimeoutRef = useRef(null);
@@ -59,12 +65,12 @@ const [shopCategoriesLoading, setShopCategoriesLoading] = useState(false);
     }, 200);
   }, [clearTimeouts]);
 
-const closePopupImmediately = useCallback(() => {
-  clearTimeouts();
-  isHoveringButton.current = false;
-  isHoveringPopup.current = false;
-  setShopPopupOpen(false);
-}, [clearTimeouts]);
+  const closePopupImmediately = useCallback(() => {
+    clearTimeouts();
+    isHoveringButton.current = false;
+    isHoveringPopup.current = false;
+    setShopPopupOpen(false);
+  }, [clearTimeouts]);
 
   const handleButtonMouseEnter = () => {
     isHoveringButton.current = true;
@@ -80,10 +86,10 @@ const closePopupImmediately = useCallback(() => {
     closePopupWithDelay();
   };
 
-const handlePopupWrapperMouseEnter = () => {
-  isHoveringPopup.current = true;
-  clearTimeouts();
-};
+  const handlePopupWrapperMouseEnter = () => {
+    isHoveringPopup.current = true;
+    clearTimeouts();
+  };
 
   const handlePopupWrapperMouseLeave = () => {
     isHoveringPopup.current = false;
@@ -95,17 +101,19 @@ const handlePopupWrapperMouseEnter = () => {
     if (!shopPopupOpen) return;
     const handleClickOutside = (event) => {
       const isClickInsideButton = shopButtonRef.current?.contains(event.target);
-      const isClickInsidePopup = shopPopupWrapperRef.current?.contains(event.target);
+      const isClickInsidePopup = shopPopupWrapperRef.current?.contains(
+        event.target,
+      );
       if (!isClickInsideButton && !isClickInsidePopup) closePopupImmediately();
     };
     const handleEscape = (event) => {
-      if (event.key === 'Escape') closePopupImmediately();
+      if (event.key === "Escape") closePopupImmediately();
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [shopPopupOpen, closePopupImmediately]);
 
@@ -115,29 +123,32 @@ const handlePopupWrapperMouseEnter = () => {
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   useEffect(() => {
-  const fetchShopCategories = async () => {
-    try {
-      setShopCategoriesLoading(true);
-      const response = await categoryService.getAllCategories();
-      const categories = response.data?.categories || [];
-      setShopCategories(categories.map(mapCategoryForPopup));
-    } catch (error) {
-      setShopCategories([]);
-    } finally {
-      setShopCategoriesLoading(false);
-    }
-  };
+    const fetchShopCategories = async () => {
+      try {
+        setShopCategoriesLoading(true);
+        const response = await categoryService.getAllCategories();
+        const categories = response.data?.categories || [];
+        setShopCategories(categories.map(mapCategoryForPopup));
+      } catch (error) {
+        setShopCategories([]);
+      } finally {
+        setShopCategoriesLoading(false);
+      }
+    };
 
-  fetchShopCategories();
-}, []);
+    fetchShopCategories();
+  }, []);
 
   useEffect(() => {
-    document.body.style.overflow = mobileMenuOpen || shopPopupOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
+    document.body.style.overflow =
+      mobileMenuOpen || shopPopupOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [mobileMenuOpen, shopPopupOpen]);
 
   const handleCategorySelect = () => {
@@ -145,31 +156,36 @@ const handlePopupWrapperMouseEnter = () => {
   };
 
   // Determine dashboard link based on role
-  const isAdminUser = role === 'super_admin' || role === 'sub_admin';
-const isVendorUser = role === 'vendor';
-const mapCategoryForPopup = (category) => ({
-  id: category._id,
-  title: category.name,
-  image: category.image?.url || '/images/placeholder.jpg',
-  link: `/category/${category.slug}`,
-  color: 'from-teal-400 to-teal-600',
-  children: category.children || [],
-});
+  const isAdminUser = role === "super_admin" || role === "sub_admin";
+  const isVendorUser = role === "vendor";
+  const mapCategoryForPopup = (category) => ({
+    id: category._id,
+    title: category.name,
+    image: category.image?.url || "/images/placeholder.jpg",
+    link: `/category/${category.slug}`,
+    color: "from-teal-400 to-teal-600",
+    children: category.children || [],
+  });
 
   return (
     <>
       <TopBar />
 
-      <nav className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${scrolled ? 'shadow-md' : 'shadow-sm'}`}>
+      <nav
+        className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${scrolled ? "shadow-md" : "shadow-sm"}`}
+      >
         <div className="max-w-9xl mx-auto px-5 md:px-8 lg:px-12 flex items-center justify-between h-16 md:h-20 gap-4">
-
           {/* Mobile menu toggle */}
           <button
             className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-400"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <CloseIcon className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+            {mobileMenuOpen ? (
+              <CloseIcon className="w-6 h-6" />
+            ) : (
+              <MenuIcon className="w-6 h-6" />
+            )}
           </button>
 
           {/* Logo */}
@@ -179,22 +195,31 @@ const mapCategoryForPopup = (category) => ({
               alt="QubanHC Logo"
               className="h-10 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <span className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight leading-none bg-gradient-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">
                 QubanHC
               </span>
               <span className="text-[10px] sm:text-xs md:text-sm font-medium text-gray-500 tracking-widest leading-tight mt-0.5 uppercase">
                 Care & Comfort
               </span>
-            </div>
+            </div> */}
           </Link>
 
           {/* Desktop nav links */}
           <ul className="hidden lg:flex items-center gap-2 xl:gap-3">
             <li>
-              <Link to="/" className="px-3 py-2 text-base lg:text-lg font-medium text-teal-600 bg-teal-50 rounded-md">Home</Link>
+              <Link
+                to="/"
+                className="px-3 py-2 text-base lg:text-lg font-medium text-teal-600 bg-teal-50 rounded-md"
+              >
+                Home
+              </Link>
             </li>
-            <li ref={shopButtonRef} onMouseEnter={handleButtonMouseEnter} onMouseLeave={handleButtonMouseLeave}>
+            <li
+              ref={shopButtonRef}
+              onMouseEnter={handleButtonMouseEnter}
+              onMouseLeave={handleButtonMouseLeave}
+            >
               <button
                 onClick={() => openPopup()}
                 className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
@@ -203,10 +228,20 @@ const mapCategoryForPopup = (category) => ({
               </button>
             </li>
             <li>
-              <Link to="/blog" className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors">Blog</Link>
+              <Link
+                to="/blog"
+                className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
+              >
+                Blog
+              </Link>
             </li>
             <li>
-              <Link to="/contact" className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors">Contact</Link>
+              <Link
+                to="/contact"
+                className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
+              >
+                Contact
+              </Link>
             </li>
           </ul>
 
@@ -256,7 +291,7 @@ const mapCategoryForPopup = (category) => ({
                   key={cartCount}
                   className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 flex items-center justify-center px-1 animate-bounce-in"
                 >
-                  {cartCount > 99 ? '99+' : cartCount}
+                  {cartCount > 99 ? "99+" : cartCount}
                 </span>
               )}
             </Link>
@@ -264,14 +299,19 @@ const mapCategoryForPopup = (category) => ({
         </div>
 
         {/* Mobile search bar (expandable) */}
-        <div className={`lg:hidden overflow-hidden transition-all duration-300 ${mobileSearchOpen ? 'max-h-24 py-3 px-4' : 'max-h-0 py-0 px-4'}`}>
+        <div
+          className={`lg:hidden overflow-hidden transition-all duration-300 ${mobileSearchOpen ? "max-h-24 py-3 px-4" : "max-h-0 py-0 px-4"}`}
+        >
           <SearchBar
             query={searchQuery}
             setQuery={setSearchQuery}
             suggestions={suggestions}
             focused={mobileSearchOpen}
             setFocused={setMobileSearchOpen}
-            onSelect={(val) => { handleSearchSelect(val); setMobileSearchOpen(false); }}
+            onSelect={(val) => {
+              handleSearchSelect(val);
+              setMobileSearchOpen(false);
+            }}
             isMobile
             className="text-base py-2.5 px-4 rounded-full ring-1 ring-gray-200 focus:ring-2 focus:ring-teal-400 w-full"
           />
@@ -291,15 +331,15 @@ const mapCategoryForPopup = (category) => ({
         ref={shopPopupWrapperRef}
         onMouseEnter={handlePopupWrapperMouseEnter}
         onMouseLeave={handlePopupWrapperMouseLeave}
-        style={{ position: 'relative', zIndex: 50 }}
+        style={{ position: "relative", zIndex: 50 }}
       >
-      <ShopPopup
-  isOpen={shopPopupOpen}
-  onClose={closePopupImmediately}
-  onCategorySelect={handleCategorySelect}
-  categories={shopCategories}
-  loading={shopCategoriesLoading}
-/>
+        <ShopPopup
+          isOpen={shopPopupOpen}
+          onClose={closePopupImmediately}
+          onCategorySelect={handleCategorySelect}
+          categories={shopCategories}
+          loading={shopCategoriesLoading}
+        />
       </div>
     </>
   );
