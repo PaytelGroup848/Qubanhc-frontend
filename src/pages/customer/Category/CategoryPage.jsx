@@ -22,11 +22,12 @@ import toast from "react-hot-toast";
 import { categoryService } from "../../../services/category";
 import { productService } from "../../../services/product";
 import { useCart } from "../../../context/CartContext";
+import Pagination, { paginateItems } from "../../../components/Pagination";
 
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
-  "http://localhost:5000"
-  // "https://qubanhygienecare.com";
+  // "http://localhost:5000"
+  "https://qubanhygienecare.com";
 
 function formatPrice(amount) {
   return new Intl.NumberFormat("en-IN", {
@@ -207,6 +208,8 @@ export default function CategoryPage() {
     bestSellerOnly: false,
     sortBy: "featured",
   });
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 12;
 
   useEffect(() => {
     if (slug) {
@@ -231,6 +234,8 @@ export default function CategoryPage() {
 
       const productsResponse = await productService.getProductsByCategory(
         categoryData._id,
+        1,
+        200,
       );
 
       const productsPayload = extractPayload(productsResponse);
@@ -259,6 +264,15 @@ export default function CategoryPage() {
   const visibleProducts = useMemo(() => {
     return sortProducts(filterProducts(products, filters), filters.sortBy);
   }, [products, filters]);
+
+  const pagedProducts = useMemo(
+    () => paginateItems(visibleProducts, page, PAGE_SIZE),
+    [visibleProducts, page],
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters, slug]);
 
   const maxPrice = useMemo(() => {
     return Math.max(
@@ -422,7 +436,7 @@ export default function CategoryPage() {
 
             <div className="grid grid-cols-2 gap-3 sm:flex">
               <Metric label="Products" value={products.length} />
-              <Metric label="Showing" value={visibleProducts.length} />
+              <Metric label="Showing" value={pagedProducts.items.length} />
               <Metric label="Subcategories" value={subCategories.length} />
             </div>
           </div>
@@ -607,7 +621,7 @@ export default function CategoryPage() {
                 : "space-y-4"
             }
           >
-            {visibleProducts.map((product) =>
+            {pagedProducts.items.map((product) =>
               viewMode === "grid" ? (
                 <ProductGridCard
                   key={getProductId(product)}
@@ -632,6 +646,17 @@ export default function CategoryPage() {
             )}
           </div>
         )}
+
+        {visibleProducts.length > 0 ? (
+          <Pagination
+            className="mt-8"
+            page={pagedProducts.page}
+            totalPages={pagedProducts.totalPages}
+            total={pagedProducts.total}
+            limit={pagedProducts.limit}
+            onPageChange={setPage}
+          />
+        ) : null}
       </section>
 
       {showMobileFilters ? (

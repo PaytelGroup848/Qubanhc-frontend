@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { adminService } from "../../../services/admin";
 import ProductImageUpload from "../../../components/ProductImageUpload";
 import toast from "react-hot-toast";
+import Pagination, { paginateItems } from "../../../components/Pagination";
 
 const emptyForm = {
   name: "",
@@ -40,6 +41,9 @@ export default function Products() {
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 20;
 
   const [categories, setCategories] = useState([]);
   const [editTarget, setEditTarget] = useState(null);
@@ -56,7 +60,7 @@ export default function Products() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await adminService.getAllProducts({ limit: 50 });
+      const response = await adminService.getAllProducts({ limit: 1000 });
       setProducts(response?.products || []);
     } catch (err) {
       console.error("Error fetching products:", err);
@@ -77,6 +81,56 @@ export default function Products() {
 
   const handleAskDelete = (product) => {
     setDeleteTarget(product);
+  };
+
+  const handleDescriptionKeyDown = (e) => {
+    if (e.key !== "Enter") return;
+
+    const { name, value, selectionStart, selectionEnd } = e.target;
+
+    const beforeCursor = value.slice(0, selectionStart);
+    const afterCursor = value.slice(selectionEnd);
+
+    const lines = beforeCursor.split("\n");
+    const currentLine = lines[lines.length - 1];
+
+    // Empty bullet par Enter → bullet remove karke new line
+    if (currentLine.trim() === "•") {
+      e.preventDefault();
+
+      lines.pop();
+
+      const newValue = [...lines, "", afterCursor].join("\n");
+
+      setEditForm((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+
+      requestAnimationFrame(() => {
+        const position = lines.join("\n").length + 1;
+        e.target.selectionStart = position;
+        e.target.selectionEnd = position;
+      });
+
+      return;
+    }
+
+    // Normal Enter → next line with bullet
+    e.preventDefault();
+
+    const newValue = `${beforeCursor}\n• ${afterCursor}`;
+
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+
+    requestAnimationFrame(() => {
+      const newPosition = selectionStart + 3;
+      e.target.selectionStart = newPosition;
+      e.target.selectionEnd = newPosition;
+    });
   };
 
   const handleCancelDelete = () => {
@@ -150,10 +204,10 @@ export default function Products() {
         highlights: p.highlights || [],
         tags: p.tags || [],
         isFeatured: p.isFeatured || false,
-        hasVariants: !!(p.hasVariants && existingVariants.length > 0),
+        hasVariants: !!(p.hasVariants && existingVariants?.length > 0),
         variants:
-          existingVariants && existingVariants.length
-            ? existingVariants.map((v) => ({
+          existingVariants && existingVariants?.length
+            ? existingVariants?.map((v) => ({
                 name: v.name || "",
                 price:
                   v.price !== undefined && v.price !== null
@@ -409,6 +463,12 @@ export default function Products() {
     p.name?.toLowerCase().includes(search.toLowerCase()),
   );
 
+  const pagedProducts = paginateItems(filtered, page, PAGE_SIZE);
+
+  useEffect(() => {
+    setPage(1);
+  }, [search]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -491,7 +551,7 @@ export default function Products() {
                   </td>
                 </tr>
               ) : (
-                filtered.map((p) => (
+                pagedProducts?.items?.map((p) => (
                   <tr
                     key={p._id}
                     className="hover:bg-gray-50 transition-colors"
@@ -589,6 +649,17 @@ export default function Products() {
           </table>
         </div>
       </div>
+
+      {filtered.length > 0 && (
+        <Pagination
+          className="mt-6"
+          page={pagedProducts.page}
+          totalPages={pagedProducts.totalPages}
+          total={pagedProducts.total}
+          limit={pagedProducts.limit}
+          onPageChange={setPage}
+        />
+      )}
 
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -741,6 +812,7 @@ export default function Products() {
                           name="description"
                           value={editForm.description}
                           onChange={handleEditChange}
+                          onKeyDown={handleDescriptionKeyDown}
                           rows={3}
                           className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none resize-y"
                           placeholder="Detailed product description..."

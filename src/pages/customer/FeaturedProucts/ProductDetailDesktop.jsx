@@ -599,9 +599,11 @@ export default function ProductDetailDesktop({
                 )}
               </div>
 
+              {console.log("this is my product showcase", product?.description)}
+              {/* Description */}
               {/* Description */}
               {product.description && (
-                <div className="text-gray-500 text-sm leading-relaxed">
+                <div className="text-gray-500 text-sm leading-relaxed whitespace-pre-line">
                   {showFullDescription ? (
                     product.description
                   ) : (
@@ -617,6 +619,7 @@ export default function ProductDetailDesktop({
                       )}
                     </>
                   )}
+
                   {showFullDescription && (
                     <button
                       onClick={() => setShowFullDescription(false)}
@@ -627,7 +630,6 @@ export default function ProductDetailDesktop({
                   )}
                 </div>
               )}
-
               {/* Divider */}
               <div className="h-px bg-gradient-to-r from-transparent via-gray-100 to-transparent" />
 
@@ -679,13 +681,13 @@ export default function ProductDetailDesktop({
                             {variant.name}
                           </p>
                           <div className="flex items-end justify-between mt-1 pr-5">
-                            {/* <p
+                            <p
                               className={`text-sm font-bold ${active ? "text-teal-600" : "text-gray-500"}`}
                             >
                               {formatPrice(variant.price)}
-                            </p> */}
+                            </p>
                             {!soldOut && variantStock <= 15 && (
-                              <p className="text-[10px] font-bold text-rose-500">
+                              <p className="text-[10px] font-bold text-rose-500 ">
                                 Only {variantStock} left
                               </p>
                             )}

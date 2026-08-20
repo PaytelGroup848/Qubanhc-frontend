@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 /* ---------- Inline Social Icons (you can later shift to Icons.jsx) ---------- */
 const FacebookIcon = ({ className = "w-5 h-5" }) => (
@@ -36,29 +36,46 @@ export default function Footer() {
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-12">
-          
           {/* Brand & Social */}
           <div className="sm:col-span-2 lg:col-span-1">
             <Link to="/" className="inline-flex items-center gap-2 mb-4">
-              <img src="/images/QubanHC.svg" alt="QubanHC" className="h-8 w-auto" />
-              <span className="text-xl font-extrabold text-white tracking-tight">
-                Quban<span className="text-teal-400">HC</span>
-              </span>
+              <img
+                src="/images/QubanHC.svg"
+                alt="QubanHC"
+                className="h-18 bg-amber-50 rounded-3xl w-auto"
+              />
             </Link>
             <p className="text-sm text-slate-300 leading-relaxed mb-6">
-              Your trusted partner for adult & baby care, hygiene essentials, and mobility aids. Quality you can rely on.
+              Your trusted partner for adult & baby care, hygiene essentials,
+              and mobility aids. Quality you can rely on.
             </p>
             <div className="flex items-center gap-4">
-              <a href="#" aria-label="Facebook" className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200">
+              <a
+                href="#"
+                aria-label="Facebook"
+                className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200"
+              >
                 <FacebookIcon className="w-5 h-5" />
               </a>
-              <a href="#" aria-label="Twitter" className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200">
+              <a
+                href="#"
+                aria-label="Twitter"
+                className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200"
+              >
                 <TwitterIcon className="w-5 h-5" />
               </a>
-              <a href="#" aria-label="Instagram" className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200">
+              <a
+                href="#"
+                aria-label="Instagram"
+                className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200"
+              >
                 <InstagramIcon className="w-5 h-5" />
               </a>
-              <a href="#" aria-label="YouTube" className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200">
+              <a
+                href="#"
+                aria-label="YouTube"
+                className="p-2 rounded-full bg-white/10 hover:bg-teal-500 transition-colors duration-200"
+              >
                 <YoutubeIcon className="w-5 h-5" />
               </a>
             </div>
@@ -66,44 +83,159 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">Quick Links</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">
+              Quick Links
+            </h3>
             <ul className="space-y-3">
-              <li><Link to="/about" className="text-sm text-slate-300 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/blog" className="text-sm text-slate-300 hover:text-white transition-colors">Blog</Link></li>
-              <li><Link to="/careers" className="text-sm text-slate-300 hover:text-white transition-colors">Careers</Link></li>
-              <li><Link to="/press" className="text-sm text-slate-300 hover:text-white transition-colors">Press</Link></li>
-              <li><Link to="/sitemap" className="text-sm text-slate-300 hover:text-white transition-colors">Sitemap</Link></li>
+              <li>
+                <Link
+                  to="/about"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/blog"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/careers"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/press"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Press
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/sitemap"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Sitemap
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Customer Service */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">Customer Service</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">
+              Customer Service
+            </h3>
             <ul className="space-y-3">
-              <li><Link to="/help" className="text-sm text-slate-300 hover:text-white transition-colors">Help Center</Link></li>
-              <li><Link to="/returns" className="text-sm text-slate-300 hover:text-white transition-colors">Returns & Refunds</Link></li>
-              <li><Link to="/shipping" className="text-sm text-slate-300 hover:text-white transition-colors">Shipping Info</Link></li>
-              <li><Link to="/track-order" className="text-sm text-slate-300 hover:text-white transition-colors">Track Order</Link></li>
-              <li><Link to="/faq" className="text-sm text-slate-300 hover:text-white transition-colors">FAQs</Link></li>
+              <li>
+                <Link
+                  to="/help"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/returns"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Returns & Refunds
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/shipping"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Shipping Info
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/track-order"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Track Order
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/faq"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  FAQs
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* My Account */}
           <div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">My Account</h3>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">
+              My Account
+            </h3>
             <ul className="space-y-3">
-              <li><Link to="/login" className="text-sm text-slate-300 hover:text-white transition-colors">Sign In</Link></li>
-              <li><Link to="/register" className="text-sm text-slate-300 hover:text-white transition-colors">Create Account</Link></li>
-              <li><Link to="/wishlist" className="text-sm text-slate-300 hover:text-white transition-colors">Wishlist</Link></li>
-              <li><Link to="/orders" className="text-sm text-slate-300 hover:text-white transition-colors">My Orders</Link></li>
-              <li><Link to="/settings" className="text-sm text-slate-300 hover:text-white transition-colors">Settings</Link></li>
+              <li>
+                <Link
+                  to="/login"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Sign In
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/register"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Create Account
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/wishlist"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Wishlist
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/orders"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  My Orders
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/settings"
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  Settings
+                </Link>
+              </li>
             </ul>
           </div>
 
           {/* Newsletter */}
           <div className="sm:col-span-2 lg:col-span-1">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">Stay Connected</h3>
-            <p className="text-sm text-slate-300 mb-4">Subscribe for health tips, new products, and exclusive offers.</p>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-teal-400 mb-4">
+              Stay Connected
+            </h3>
+            <p className="text-sm text-slate-300 mb-4">
+              Subscribe for health tips, new products, and exclusive offers.
+            </p>
             <form className="flex flex-wrap gap-2">
               <input
                 type="email"
@@ -126,12 +258,20 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-400">
           <p>&copy; {currentYear} QubanHC. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
+            <Link to="/privacy" className="hover:text-white transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="hover:text-white transition-colors">
+              Terms of Service
+            </Link>
+            <Link to="/cookies" className="hover:text-white transition-colors">
+              Cookie Policy
+            </Link>
           </div>
           <div className="flex items-center gap-3 text-white/70">
-            <span className="text-xs font-medium tracking-wide">We accept:</span>
+            <span className="text-xs font-medium tracking-wide">
+              We accept:
+            </span>
             <span className="text-lg">💳</span>
             <span className="text-lg">🏦</span>
             <span className="text-lg">📱</span>

@@ -37,7 +37,7 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
   const tax = settings?.tax || {};
 
   const company = {
-    name: billing.companyName || 'Quban HC',
+    name: billing.companyName || "Quban HC",
     address: [
       billing.address,
       billing.city,
@@ -46,11 +46,11 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
       billing.country,
     ]
       .filter(Boolean)
-      .join(', '),
-    email: billing.email || support.email || 'support@qubanhc.com',
-    phone: billing.phone || support.phone || '',
-    gstin: billing.gstin || tax.gstNumber || '',
-    pan: billing.pan || '',
+      .join(", "),
+    email: billing.email || support.email || "qubanhygienecare@gmail.com",
+    phone: billing.phone || support.phone || "",
+    gstin: billing.gstin || tax.gstNumber || "",
+    pan: billing.pan || "",
   };
 
   const paymentStatus =
@@ -149,10 +149,10 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
                 className="mb-0.5 text-[15px] font-bold text-[#0b1220]"
                 style={{ fontFamily: "'Sora', sans-serif" }}
               >
-                {order?.customerName || '-'}
+                {order?.customerName || "-"}
               </p>
-              <p>{order?.customerEmail || '-'}</p>
-              <p>{order?.customerPhone || '-'}</p>
+              <p>{order?.customerEmail || "-"}</p>
+              <p>{order?.customerPhone || "-"}</p>
 
               <p className="mt-2">
                 {[
@@ -164,7 +164,7 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
                   order?.shippingAddress?.country,
                 ]
                   .filter(Boolean)
-                  .join(', ') || '-'}
+                  .join(", ") || "-"}
               </p>
             </div>
           </div>
@@ -176,14 +176,14 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
 
             <div className="mt-3 space-y-1.5 text-[12.5px]">
               <Row label="Invoice No" value={invoiceNumber} />
-              <Row label="Order ID" value={order?.orderId || '-'} />
+              <Row label="Order ID" value={order?.orderId || "-"} />
               <Row
                 label="Invoice Date"
                 value={formatDate(invoice?.createdAt || new Date())}
               />
               <Row
                 label="Payment Method"
-                value={(order?.payment?.method || '-').toUpperCase()}
+                value={(order?.payment?.method || "-").toUpperCase()}
               />
             </div>
           </div>
@@ -212,7 +212,10 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
             <tbody className="divide-y divide-slate-100">
               {items.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-5 py-6 text-center text-slate-400">
+                  <td
+                    colSpan={4}
+                    className="px-5 py-6 text-center text-slate-400"
+                  >
                     No items found
                   </td>
                 </tr>
@@ -267,7 +270,9 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
             <div className="my-3.5 border-t border-dashed border-slate-200" />
 
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-[#0b1220]">Grand Total</span>
+              <span className="text-sm font-bold text-[#0b1220]">
+                Grand Total
+              </span>
               <span
                 className="text-[21px] font-extrabold tracking-tight text-[#0f9d70]"
                 style={{ fontFamily: "'Sora', sans-serif" }}
@@ -285,7 +290,7 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
               Notes
             </h4>
             <p className="mt-2 text-[12.5px] leading-[19px] text-slate-500">
-              Thank you for shopping with {company.name}. For support, contact{' '}
+              Thank you for shopping with {company.name}. For support, contact{" "}
               {company.email}.
             </p>
           </div>
@@ -295,8 +300,8 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
               Declaration
             </h4>
             <p className="mt-2 text-[12.5px] leading-[19px] text-slate-500">
-              This is a computer-generated invoice and does not require a physical
-              signature.
+              This is a computer-generated invoice and does not require a
+              physical signature.
             </p>
           </div>
         </div>
@@ -304,7 +309,8 @@ export default function InvoiceTemplate({ invoice, order, settings }) {
         {/* Footer */}
         <div className="mt-8 border-t border-slate-100 pt-4 text-center text-[11.5px] font-medium text-slate-400">
           <p>
-            Invoice generated by {company.name} · {company.email || 'support@qubanhc.com'}
+            Invoice generated by {company.name} ·{" "}
+            {company.email || "qubanhygienecare@gmail.com"}
           </p>
         </div>
       </div>

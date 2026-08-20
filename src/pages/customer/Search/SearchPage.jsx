@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, PackageSearch, Search } from "lucide-react";
 import toast from "react-hot-toast";
 import { productService } from "../../../services/product";
+import Pagination, { extractPagination } from "../../../components/Pagination";
 import { useCart } from "../../../context/CartContext";
 import { useAuth } from "../../../context/AuthContext";
 import { wishlistService } from "../../../services/wishlist";
@@ -46,12 +47,22 @@ export default function SearchPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 1,
+  });
+
+  useEffect(() => {
+    setPage(1);
+  }, [query]);
 
   useEffect(() => {
     if (!query) {
       setProducts([]);
-      setTotal(0);
+      setPagination({ page: 1, limit: 20, total: 0, totalPages: 1 });
       setError(null);
       return;
     }
@@ -63,21 +74,26 @@ export default function SearchPage() {
         setLoading(true);
         setError(null);
 
-        const response = await productService.searchProducts(query);
+        const response = await productService.searchProducts(query, page, 12);
         const payload = extractPayload(response);
         const list = payload?.products || [];
-        const pagination = payload?.pagination || {};
 
         if (mounted) {
           setProducts(Array.isArray(list) ? list : []);
-          setTotal(pagination.total ?? list.length);
+          setPagination(
+            extractPagination(payload, {
+              page,
+              limit: 20,
+              total: Array.isArray(list) ? list.length : 0,
+            }),
+          );
         }
       } catch (err) {
         console.error("Search error:", err);
         if (mounted) {
           setError(err?.response?.data?.message || "Search failed");
           setProducts([]);
-          setTotal(0);
+          setPagination({ page: 1, limit: 20, total: 0, totalPages: 1 });
         }
       } finally {
         if (mounted) setLoading(false);
@@ -89,7 +105,7 @@ export default function SearchPage() {
     return () => {
       mounted = false;
     };
-  }, [query]);
+  }, [query, page]);
 
   const requireLogin = useCallback(
     (from = "/") => {
@@ -186,7 +202,8 @@ export default function SearchPage() {
               </h1>
               {query && !loading ? (
                 <p className="mt-1 text-sm font-medium text-slate-500">
-                  {total} {total === 1 ? "product" : "products"} found
+                  {pagination.total}{" "}
+                  {pagination.total === 1 ? "product" : "products"} found
                 </p>
               ) : null}
             </div>
@@ -231,16 +248,26 @@ export default function SearchPage() {
             </Link>
           </div>
         ) : (
-          <Suspense fallback={<SectionSkeleton />}>
-            <FeaturedProducts
-              products={products}
-              loading={loading}
-              error={error}
-              onAddToCart={handleAddToCart}
-              onBuyNow={handleBuyNow}
-              onWishlistToggle={handleWishlistToggle}
+          <>
+            <Suspense fallback={<SectionSkeleton />}>
+              <FeaturedProducts
+                products={products}
+                loading={loading}
+                error={error}
+                onAddToCart={handleAddToCart}
+                onBuyNow={handleBuyNow}
+                onWishlistToggle={handleWishlistToggle}
+              />
+            </Suspense>
+            <Pagination
+              className="mt-8"
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              total={pagination.total}
+              limit={pagination.limit}
+              onPageChange={setPage}
             />
-          </Suspense>
+          </>
         )}
       </div>
     </main>

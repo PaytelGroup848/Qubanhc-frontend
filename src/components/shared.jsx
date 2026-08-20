@@ -43,14 +43,25 @@ export function ErrorState({ message }) {
   );
 }
 
-export function PaginationFooter({ total, shown }) {
+import Pagination from './Pagination';
+
+export function PaginationFooter({
+  page = 1,
+  totalPages = 1,
+  total = 0,
+  limit = 10,
+  onPageChange,
+}) {
   return (
-    <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between text-sm">
-      <span className="text-gray-500">Showing {shown} of {total} results</span>
-      <div className="flex gap-2">
-        <button className="px-3 py-1 border rounded text-gray-500 hover:bg-gray-50" disabled>Previous</button>
-        <button className="px-3 py-1 border rounded text-gray-500 hover:bg-gray-50">Next</button>
-      </div>
+    <div className="px-6 py-3 border-t border-gray-100">
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        limit={limit}
+        onPageChange={onPageChange}
+        variant="admin"
+      />
     </div>
   );
 }

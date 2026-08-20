@@ -1,35 +1,35 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeft,
   Download,
   Loader2,
   RefreshCw,
   ShieldCheck,
-} from 'lucide-react';
-import toast from 'react-hot-toast';
+} from "lucide-react";
+import toast from "react-hot-toast";
 
-import { invoiceService } from '../../services/invoice';
-import { downloadInvoicePdf } from '../../utils/downloadInvoicePdf';
+import { invoiceService } from "../../services/invoice";
+import { downloadInvoicePdf } from "../../utils/downloadInvoicePdf";
 
 /* ------------------------------------------------------------------ */
 /*  Fonts + global responsive stylesheet (injected once)              */
 /*  Display: 'Sora' — geometric, confident, used for headings/numbers */
 /*  Body:    'Inter' — high legibility workhorse for data-dense areas */
 /* ------------------------------------------------------------------ */
-const GLOBAL_STYLE_ID = 'invoice-page-premium-styles';
+const GLOBAL_STYLE_ID = "invoice-page-premium-styles";
 
 function useInjectInvoiceStyles() {
   useEffect(() => {
     if (document.getElementById(GLOBAL_STYLE_ID)) return;
 
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
     link.href =
-      'https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap';
+      "https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap";
     document.head.appendChild(link);
 
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.id = GLOBAL_STYLE_ID;
     style.innerHTML = `
       .inv-page-root, .inv-page-root * { box-sizing: border-box; }
@@ -320,22 +320,22 @@ function useInjectInvoiceStyles() {
 }
 
 const formatCurrency = (amount = 0) => {
-  return `₹${Number(amount || 0).toLocaleString('en-IN')}`;
+  return `₹${Number(amount || 0).toLocaleString("en-IN")}`;
 };
 
 const formatDate = (date) => {
-  if (!date) return '-';
+  if (!date) return "-";
 
   const parsedDate = new Date(date);
 
   if (Number.isNaN(parsedDate.getTime())) {
-    return '-';
+    return "-";
   }
 
-  return parsedDate.toLocaleDateString('en-IN', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
+  return parsedDate.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
   });
 };
 
@@ -347,9 +347,7 @@ function extractPayload(response) {
   const settings = inner?.settings || {};
 
   const order =
-    invoice?.order && typeof invoice.order === 'object'
-      ? invoice.order
-      : null;
+    invoice?.order && typeof invoice.order === "object" ? invoice.order : null;
 
   return {
     invoice,
@@ -359,8 +357,8 @@ function extractPayload(response) {
 }
 
 export default function InvoicePage({
-  backUrl = '/admin/orders',
-  backLabel = 'Back to Orders',
+  backUrl = "/admin/orders",
+  backLabel = "Back to Orders",
 }) {
   useInjectInvoiceStyles();
 
@@ -389,19 +387,19 @@ export default function InvoicePage({
       try {
         await invoiceService.generateInvoice(finalOrderId);
       } catch (generateError) {
-        console.warn('Invoice generate warning:', generateError);
+        console.warn("Invoice generate warning:", generateError);
       }
 
       const response = await invoiceService.getInvoiceByOrder(finalOrderId);
 
       const { invoice, order, settings } = extractPayload(response);
       if (!invoice) {
-        throw new Error('Invoice not found');
+        throw new Error("Invoice not found");
       }
 
       if (!order) {
-        console.error('Invoice fetched but order is not populated:', invoice);
-        throw new Error('Order data is not populated from backend');
+        console.error("Invoice fetched but order is not populated:", invoice);
+        throw new Error("Order data is not populated from backend");
       }
 
       setInvoiceData({
@@ -410,11 +408,11 @@ export default function InvoicePage({
         settings,
       });
     } catch (error) {
-      console.error('Invoice load error:', error);
+      console.error("Invoice load error:", error);
       toast.error(
         error?.response?.data?.message ||
           error.message ||
-          'Failed to load invoice'
+          "Failed to load invoice",
       );
       setInvoiceData(null);
     } finally {
@@ -427,20 +425,20 @@ export default function InvoicePage({
       setDownloading(true);
 
       if (!invoiceRef.current) {
-        throw new Error('Invoice template not ready');
+        throw new Error("Invoice template not ready");
       }
 
       const invoiceNumber =
         invoiceData?.invoice?.invoiceNumber ||
         invoiceData?.order?.orderId ||
-        'invoice';
+        "invoice";
 
       await downloadInvoicePdf(invoiceRef.current, `${invoiceNumber}.pdf`);
 
-      toast.success('Invoice downloaded successfully');
+      toast.success("Invoice downloaded successfully");
     } catch (error) {
-      console.error('Invoice download error:', error);
-      toast.error(error.message || 'Failed to download invoice');
+      console.error("Invoice download error:", error);
+      toast.error(error.message || "Failed to download invoice");
     } finally {
       setDownloading(false);
     }
@@ -470,7 +468,7 @@ export default function InvoicePage({
               type="button"
               onClick={() => navigate(-1)}
               className="inv-btn inv-btn-primary"
-              style={{ marginTop: '20px' }}
+              style={{ marginTop: "20px" }}
             >
               Go Back
             </button>
@@ -494,8 +492,12 @@ export default function InvoicePage({
           <p>Same invoice page for admin and customer.</p>
         </div>
 
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <button type="button" onClick={loadInvoice} className="inv-btn inv-btn-ghost">
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <button
+            type="button"
+            onClick={loadInvoice}
+            className="inv-btn inv-btn-ghost"
+          >
             <RefreshCw size={15} />
             Refresh
           </button>
@@ -553,22 +555,22 @@ function InvoiceDesign({ invoice, order, settings }) {
       billing.country,
     ]
       .filter(Boolean)
-      .join(', ') || 'India';
+      .join(", ") || "India";
 
   const company = {
-    name: billing.companyName || billing.name || 'Quban HC',
+    name: billing.companyName || billing.name || "Quban HC",
     address: companyAddress,
-    email: billing.email || support.email || 'support@qubanhc.com',
-    phone: billing.phone || support.phone || '',
-    gstin: billing.gstin || billing.gstNumber || tax.gstNumber || '',
-    pan: billing.pan || '',
+    email: billing.email || support.email || "qubanhygienecare@gmail.com",
+    phone: billing.phone || support.phone || "",
+    gstin: billing.gstin || billing.gstNumber || tax.gstNumber || "",
+    pan: billing.pan || "",
   };
 
   const invoiceNumber =
     invoice?.invoiceNumber || `INV-${order?.orderId || Date.now()}`;
 
   const paymentStatus =
-    invoice?.paymentStatus || order?.payment?.status || 'paid';
+    invoice?.paymentStatus || order?.payment?.status || "paid";
 
   const customer = {
     name:
@@ -576,20 +578,20 @@ function InvoiceDesign({ invoice, order, settings }) {
       order?.user?.name ||
       invoice?.customerName ||
       order?.shippingAddress?.fullName ||
-      '-',
+      "-",
 
     email:
       order?.customerEmail ||
       order?.user?.email ||
       invoice?.customerEmail ||
-      '-',
+      "-",
 
     phone:
       order?.customerPhone ||
       order?.user?.phone ||
       invoice?.customerPhone ||
       order?.shippingAddress?.phone ||
-      '-',
+      "-",
   };
 
   const totals = {
@@ -614,14 +616,14 @@ function InvoiceDesign({ invoice, order, settings }) {
       order?.shippingAddress?.country,
     ]
       .filter(Boolean)
-      .join(', ') || '-';
+      .join(", ") || "-";
 
-  const logoInitials = (company.name || 'QH')
-    .split(' ')
+  const logoInitials = (company.name || "QH")
+    .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((w) => w[0])
-    .join('')
+    .join("")
     .toUpperCase();
 
   return (
@@ -635,7 +637,9 @@ function InvoiceDesign({ invoice, order, settings }) {
 
             <div>
               <h1 className="inv-company-name inv-display">{company.name}</h1>
-              <p className="inv-tagline">Premium Healthcare &amp; Lifestyle Store</p>
+              <p className="inv-tagline">
+                Premium Healthcare &amp; Lifestyle Store
+              </p>
             </div>
           </div>
 
@@ -677,12 +681,25 @@ function InvoiceDesign({ invoice, order, settings }) {
 
           <div className="inv-card-body">
             <InfoRowInline label="Invoice No" value={invoiceNumber} />
-            <InfoRowInline label="Order ID" value={order?.orderId || invoice?.orderId || '-'} />
-            <InfoRowInline label="Invoice Date" value={formatDate(invoice?.createdAt || new Date())} />
-            <InfoRowInline label="Order Date" value={formatDate(order?.createdAt || order?.orderedAt)} />
+            <InfoRowInline
+              label="Order ID"
+              value={order?.orderId || invoice?.orderId || "-"}
+            />
+            <InfoRowInline
+              label="Invoice Date"
+              value={formatDate(invoice?.createdAt || new Date())}
+            />
+            <InfoRowInline
+              label="Order Date"
+              value={formatDate(order?.createdAt || order?.orderedAt)}
+            />
             <InfoRowInline
               label="Payment Method"
-              value={(order?.payment?.method || invoice?.paymentMethod || '-').toUpperCase()}
+              value={(
+                order?.payment?.method ||
+                invoice?.paymentMethod ||
+                "-"
+              ).toUpperCase()}
             />
           </div>
         </div>
@@ -693,48 +710,80 @@ function InvoiceDesign({ invoice, order, settings }) {
         <table className="inv-table">
           <thead>
             <tr>
-              <th className="inv-th" style={{ textAlign: 'left' }}>Item</th>
-              <th className="inv-th" style={{ textAlign: 'center' }}>Qty</th>
-              <th className="inv-th" style={{ textAlign: 'right' }}>Price</th>
-              <th className="inv-th" style={{ textAlign: 'right' }}>Total</th>
+              <th className="inv-th" style={{ textAlign: "left" }}>
+                Item
+              </th>
+              <th className="inv-th" style={{ textAlign: "center" }}>
+                Qty
+              </th>
+              <th className="inv-th" style={{ textAlign: "right" }}>
+                Price
+              </th>
+              <th className="inv-th" style={{ textAlign: "right" }}>
+                Total
+              </th>
             </tr>
           </thead>
 
           <tbody>
             {items.length === 0 ? (
               <tr>
-                <td colSpan={4} className="inv-td" style={{ textAlign: 'center', color: '#9aa2b1' }}>
+                <td
+                  colSpan={4}
+                  className="inv-td"
+                  style={{ textAlign: "center", color: "#9aa2b1" }}
+                >
                   No items found
                 </td>
               </tr>
             ) : (
               items.map((item, index) => {
                 const productName =
-                  item.name || item.product?.name || item.productName || 'Product';
+                  item.name ||
+                  item.product?.name ||
+                  item.productName ||
+                  "Product";
 
-                const sku = item.sku || item.product?.sku || item.variant?.sku || '';
+                const sku =
+                  item.sku || item.product?.sku || item.variant?.sku || "";
 
-                const variantName = item.variantName || item.variant?.name || '';
+                const variantName =
+                  item.variantName || item.variant?.name || "";
 
                 const quantity = Number(item.quantity || 1);
 
                 const price = Number(
-                  item.price || item.product?.price || item.variant?.price || 0
+                  item.price || item.product?.price || item.variant?.price || 0,
                 );
 
-                const total = Number(item.total || item.lineTotal || quantity * price || 0);
+                const total = Number(
+                  item.total || item.lineTotal || quantity * price || 0,
+                );
 
                 return (
                   <tr key={item._id || index}>
                     <td className="inv-td">
                       <p className="inv-item-name">{productName}</p>
-                      {variantName && <p className="inv-small">Variant: {variantName}</p>}
+                      {variantName && (
+                        <p className="inv-small">Variant: {variantName}</p>
+                      )}
                       {sku && <p className="inv-small">SKU: {sku}</p>}
                     </td>
 
-                    <td className="inv-td" style={{ textAlign: 'center' }}>{quantity}</td>
-                    <td className="inv-td" style={{ textAlign: 'right' }}>{formatCurrency(price)}</td>
-                    <td className="inv-td" style={{ textAlign: 'right', fontWeight: 800, color: '#0b1220' }}>
+                    <td className="inv-td" style={{ textAlign: "center" }}>
+                      {quantity}
+                    </td>
+                    <td className="inv-td" style={{ textAlign: "right" }}>
+                      {formatCurrency(price)}
+                    </td>
+                    <td
+                      className="inv-td"
+                      style={{
+                        textAlign: "right",
+                        fontWeight: 800,
+                        color: "#0b1220",
+                      }}
+                    >
                       {formatCurrency(total)}
                     </td>
                   </tr>
@@ -749,15 +798,23 @@ function InvoiceDesign({ invoice, order, settings }) {
       <div className="inv-summary-wrap">
         <div className="inv-summary-card">
           <TotalRowInline label="Subtotal" value={totals.subtotal} />
-          <TotalRowInline label="Discount" value={-(totals.discountAmount || 0)} />
+          <TotalRowInline
+            label="Discount"
+            value={-(totals.discountAmount || 0)}
+          />
           <TotalRowInline label="Shipping" value={totals.shippingCharge} />
-          <TotalRowInline label={`GST (${totals.taxRate || 0}%)`} value={totals.taxAmount} />
+          <TotalRowInline
+            label={`GST (${totals.taxRate || 0}%)`}
+            value={totals.taxAmount}
+          />
 
           <div className="inv-divider" />
 
           <div className="inv-grand">
             <span className="inv-grand-label">Grand Total</span>
-            <span className="inv-grand-value inv-display">{formatCurrency(totals.total)}</span>
+            <span className="inv-grand-value inv-display">
+              {formatCurrency(totals.total)}
+            </span>
           </div>
         </div>
       </div>
@@ -767,14 +824,16 @@ function InvoiceDesign({ invoice, order, settings }) {
         <div className="inv-note-box">
           <h4 className="inv-note-title">Notes</h4>
           <p className="inv-note-text">
-            Thank you for shopping with {company.name}. For support, contact {company.email}.
+            Thank you for shopping with {company.name}. For support, contact{" "}
+            {company.email}.
           </p>
         </div>
 
         <div className="inv-note-box">
           <h4 className="inv-note-title">Declaration</h4>
           <p className="inv-note-text">
-            This is a computer-generated invoice and does not require a physical signature.
+            This is a computer-generated invoice and does not require a physical
+            signature.
           </p>
         </div>
       </div>
@@ -782,7 +841,9 @@ function InvoiceDesign({ invoice, order, settings }) {
       {/* Footer */}
       <div className="inv-footer">
         <ShieldCheck size={14} color="#9aa2b1" />
-        <span>Invoice generated by {company.name} · {company.email}</span>
+        <span>
+          Invoice generated by {company.name} · {company.email}
+        </span>
       </div>
     </div>
   );

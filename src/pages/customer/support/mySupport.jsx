@@ -16,6 +16,7 @@ import {
 import toast from 'react-hot-toast';
 
 import supportService from '../../../services/support';
+import Pagination, { extractPagination } from '../../../components/Pagination';
 
 const CATEGORY_OPTIONS = [
   { value: 'order', label: 'Order Issue' },
@@ -101,6 +102,12 @@ export default function MySupport() {
     page: 1,
     limit: 10,
   });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
+  });
 
   const [form, setForm] = useState({
     subject: '',
@@ -142,6 +149,13 @@ export default function MySupport() {
       const payload = extractPayload(response);
 
       setTickets(Array.isArray(payload?.tickets) ? payload.tickets : []);
+      setPagination(
+        extractPagination(payload, {
+          page: filters.page,
+          limit: filters.limit,
+          total: Array.isArray(payload?.tickets) ? payload.tickets.length : 0,
+        }),
+      );
     } catch (error) {
       console.error('My support fetch error:', error);
       toast.error(error?.response?.data?.message || 'Failed to fetch tickets');
@@ -151,7 +165,7 @@ export default function MySupport() {
   };
 
   const handleSearch = async () => {
-    await fetchTickets();
+    setFilters((prev) => ({ ...prev, page: 1 }));
   };
 
   const validateForm = () => {
@@ -388,6 +402,17 @@ export default function MySupport() {
               ))
             )}
           </div>
+
+          <Pagination
+            className="mt-5"
+            page={pagination.page}
+            totalPages={pagination.totalPages}
+            total={pagination.total}
+            limit={pagination.limit}
+            onPageChange={(nextPage) =>
+              setFilters((prev) => ({ ...prev, page: nextPage }))
+            }
+          />
         </div>
       </div>
 

@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import cartService from "../../../services/cart";
 import {
   AlertCircle,
@@ -15,7 +14,6 @@ import {
   RefreshCw,
   ShieldCheck,
   ShoppingCart,
-  Sparkles,
   Trash2,
   Truck,
   X,
@@ -50,23 +48,23 @@ function safeNumber(value) {
 export function Toast({ message, type = "success", onClose }) {
   const config = {
     success: {
-      wrapper: "border-emerald-800 bg-emerald-950",
-      text: "text-emerald-100",
+      wrapper: "border-teal-200 bg-white",
+      text: "text-teal-800",
       Icon: CheckCircle2,
     },
     error: {
-      wrapper: "border-rose-800 bg-rose-950",
-      text: "text-rose-100",
+      wrapper: "border-rose-200 bg-white",
+      text: "text-rose-700",
       Icon: AlertCircle,
     },
     info: {
-      wrapper: "border-slate-700 bg-slate-900",
-      text: "text-slate-100",
+      wrapper: "border-gray-200 bg-white",
+      text: "text-gray-700",
       Icon: Info,
     },
   }[type] || {
-    wrapper: "border-slate-700 bg-slate-900",
-    text: "text-slate-100",
+    wrapper: "border-gray-200 bg-white",
+    text: "text-gray-700",
     Icon: Info,
   };
 
@@ -78,25 +76,21 @@ export function Toast({ message, type = "success", onClose }) {
   const Icon = config.Icon;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.94 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 20, scale: 0.96 }}
-      transition={{ type: "spring", stiffness: 420, damping: 30 }}
-      className={`fixed bottom-5 left-1/2 z-[999] flex max-w-[92vw] -translate-x-1/2 items-center gap-3 rounded-2xl border px-4 py-3 shadow-2xl backdrop-blur ${config.wrapper}`}
+    <div
+      className={`fixed bottom-5 left-1/2 z-[999] flex max-w-[92vw] -translate-x-1/2 items-center gap-3 rounded-md border px-4 py-3 shadow-md ${config.wrapper}`}
     >
       <Icon className={`h-4 w-4 flex-shrink-0 ${config.text}`} />
-      <span className={`whitespace-nowrap text-sm font-bold ${config.text}`}>
+      <span className={`whitespace-nowrap text-sm font-medium ${config.text}`}>
         {message}
       </span>
       <button
         type="button"
         onClick={onClose}
-        className={`rounded-lg p-1 opacity-70 transition hover:opacity-100 ${config.text}`}
+        className={`rounded p-1 opacity-70 transition hover:opacity-100 ${config.text}`}
       >
         <X className="h-3.5 w-3.5" />
       </button>
-    </motion.div>
+    </div>
   );
 }
 
@@ -105,70 +99,39 @@ function ShippingProgress({ subtotal, freeDeliveryThreshold }) {
   const remaining = Math.max(0, threshold - subtotal);
   const progress = Math.min(100, Math.round((subtotal / threshold) * 100));
 
+  if (remaining === 0) {
+    return (
+      <div className="flex items-center gap-3 rounded-md border border-teal-200 bg-teal-50 p-3">
+        <CheckCircle2 className="h-5 w-5 flex-shrink-0 text-teal-600" />
+        <p className="text-sm font-medium text-teal-800">
+          Free delivery unlocked on this order
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <AnimatePresence mode="wait">
-      {remaining === 0 ? (
-        <motion.div
-          key="free"
-          initial={{ opacity: 0, scale: 0.97 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          className="overflow-hidden rounded-3xl border border-emerald-200/70 bg-gradient-to-r from-emerald-50 to-teal-50 p-4 shadow-sm"
-        >
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-100">
-              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-            </div>
-            <div>
-              <p className="text-sm font-black text-emerald-900">
-                Free delivery unlocked 🎉
-              </p>
-              <p className="mt-0.5 text-xs font-semibold text-emerald-700">
-                Your order ships for free.
-              </p>
-            </div>
-          </div>
-        </motion.div>
-      ) : (
-        <motion.div
-          key="progress"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="rounded-3xl border border-slate-100 bg-white p-4 shadow-sm"
-        >
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-2">
-              <Truck className="h-4 w-4 flex-shrink-0 text-teal-600" />
-              <span className="truncate text-sm font-semibold text-slate-700">
-                Add{" "}
-                <span className="font-black text-teal-700">
-                  {fmt(remaining)}
-                </span>{" "}
-                for free delivery
-              </span>
-            </div>
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-black text-slate-500">
-              {progress}%
-            </span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-            <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
-            />
-          </div>
-          {remaining <= 400 ? (
-            <p className="mt-2 flex items-center gap-1 text-[11px] font-black text-teal-700">
-              <Sparkles className="h-3 w-3" />
-              Almost there!
-            </p>
-          ) : null}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <div className="rounded-md border border-gray-200 bg-white p-3">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2">
+          <Truck className="h-4 w-4 flex-shrink-0 text-teal-600" />
+          <span className="truncate text-sm text-gray-600">
+            Add{" "}
+            <span className="font-semibold text-gray-900">
+              {fmt(remaining)}
+            </span>{" "}
+            for free delivery
+          </span>
+        </div>
+        <span className="text-xs font-medium text-gray-400">{progress}%</span>
+      </div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+        <div
+          className="h-full rounded-full bg-teal-600 transition-all"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -182,7 +145,7 @@ function CouponBox({ coupons = DEFAULT_COUPONS, onApply, applied, onRemove }) {
     if (!upper) return;
 
     setLoading(true);
-    await new Promise((resolve) => window.setTimeout(resolve, 350));
+    await new Promise((resolve) => window.setTimeout(resolve, 300));
 
     const coupon = coupons[upper];
     if (coupon) {
@@ -190,7 +153,7 @@ function CouponBox({ coupons = DEFAULT_COUPONS, onApply, applied, onRemove }) {
       onApply({ code: upper, ...coupon });
     } else {
       setStatus("invalid");
-      window.setTimeout(() => setStatus(null), 2200);
+      window.setTimeout(() => setStatus(null), 2000);
     }
 
     setLoading(false);
@@ -198,21 +161,15 @@ function CouponBox({ coupons = DEFAULT_COUPONS, onApply, applied, onRemove }) {
 
   if (applied) {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.97 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="rounded-3xl border border-teal-200 bg-teal-50 p-4"
-      >
+      <div className="rounded-md border border-teal-200 bg-teal-50 p-3">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-teal-100">
-              <Gift className="h-4 w-4 text-teal-700" />
-            </div>
+          <div className="flex items-center gap-2">
+            <Gift className="h-4 w-4 text-teal-700" />
             <div>
-              <p className="text-sm font-black text-teal-900">
+              <p className="text-sm font-semibold text-teal-900">
                 {applied.code} applied
               </p>
-              <p className="mt-0.5 text-xs font-bold text-teal-700">
+              <p className="text-xs text-teal-700">
                 {applied.label} on this order
               </p>
             </div>
@@ -220,20 +177,20 @@ function CouponBox({ coupons = DEFAULT_COUPONS, onApply, applied, onRemove }) {
           <button
             type="button"
             onClick={onRemove}
-            className="rounded-xl p-1.5 text-teal-500 transition hover:bg-teal-100 hover:text-teal-800"
+            className="rounded p-1 text-teal-600 hover:bg-teal-100"
           >
             <X className="h-4 w-4" />
           </button>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   return (
-    <div className="rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
-      <div className="mb-3 flex items-center gap-2">
+    <div className="rounded-md border border-gray-200 bg-white p-3">
+      <div className="mb-2 flex items-center gap-2">
         <Gift className="h-4 w-4 text-teal-600" />
-        <span className="text-sm font-black text-slate-800">
+        <span className="text-sm font-semibold text-gray-800">
           Have a coupon?
         </span>
       </div>
@@ -250,59 +207,39 @@ function CouponBox({ coupons = DEFAULT_COUPONS, onApply, applied, onRemove }) {
               if (event.key === "Enter") handleApply();
             }}
             placeholder="Enter coupon"
-            className={`w-full rounded-2xl border px-3.5 py-3 text-sm font-black uppercase outline-none transition ${
+            className={`w-full rounded-md border px-3 py-2 text-sm uppercase outline-none transition ${
               status === "valid"
-                ? "border-emerald-400 bg-emerald-50 text-emerald-700"
+                ? "border-teal-400 bg-teal-50 text-teal-700"
                 : status === "invalid"
-                  ? "border-rose-400 bg-rose-50 text-rose-600"
-                  : "border-slate-200 bg-slate-50 text-slate-900 focus:border-teal-400 focus:bg-white focus:ring-4 focus:ring-teal-100"
+                  ? "border-rose-300 bg-rose-50 text-rose-600"
+                  : "border-gray-300 text-gray-900 focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
             }`}
           />
-          {status === "valid" ? (
-            <CheckCircle2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-500" />
-          ) : null}
-          {status === "invalid" ? (
-            <AlertCircle className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-rose-500" />
-          ) : null}
         </div>
 
-        <motion.button
+        <button
           type="button"
-          whileTap={{ scale: 0.96 }}
           onClick={handleApply}
           disabled={loading || !code.trim()}
-          className="rounded-2xl bg-teal-600 px-4 py-3 text-sm font-black text-white shadow-sm transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+          className="rounded-md bg-teal-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-700 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
         >
-          {loading ? (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 0.6, repeat: Infinity, ease: "linear" }}
-            >
-              <RefreshCw className="h-4 w-4" />
-            </motion.div>
-          ) : (
-            "Apply"
-          )}
-        </motion.button>
+          {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Apply"}
+        </button>
       </div>
 
       {status === "invalid" ? (
-        <motion.p
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-2 text-xs font-bold text-rose-500"
-        >
+        <p className="mt-2 text-xs text-rose-600">
           Invalid code. Try SAVE10, FLAT500, or WELCOME20.
-        </motion.p>
+        </p>
       ) : null}
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-2">
         {Object.keys(coupons).map((item) => (
           <button
             key={item}
             type="button"
             onClick={() => setCode(item)}
-            className="rounded-full border border-teal-100 bg-teal-50 px-2.5 py-1 text-[10px] font-black text-teal-700 transition hover:bg-teal-100"
+            className="rounded border border-teal-200 bg-teal-50 px-2 py-1 text-[11px] font-medium text-teal-700 hover:bg-teal-100"
           >
             {item}
           </button>
@@ -341,87 +278,73 @@ function OrderSummary({ summary, onCheckout }) {
   ].filter(Boolean);
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm lg:sticky lg:top-24">
-      <div className="flex items-center gap-2 border-b border-slate-100 px-5 pb-3 pt-5">
+    <div className="rounded-md border border-gray-200 bg-white">
+      <div className="flex items-center gap-2 border-b border-gray-200 px-4 py-3">
         <CreditCard className="h-4 w-4 text-teal-600" />
-        <h3 className="text-sm font-black text-slate-950">Order Summary</h3>
+        <h3 className="text-sm font-semibold text-gray-900">Order Summary</h3>
       </div>
 
-      <div className="space-y-3 px-5 py-4">
+      <div className="space-y-2 px-4 py-3 text-sm">
         {rows.map((row) => (
           <div
             key={row.label}
             className="flex items-center justify-between gap-4"
           >
             <span
-              className={`text-sm font-semibold ${row.tone === "muted" ? "text-slate-400" : "text-slate-600"}`}
+              className={
+                row.tone === "muted" ? "text-gray-400" : "text-gray-600"
+              }
             >
               {row.label}
             </span>
-            <motion.span
-              key={row.value}
-              initial={{ opacity: 0, x: 6 }}
-              animate={{ opacity: 1, x: 0 }}
-              className={`text-sm font-black ${row.tone === "success" ? "text-emerald-600" : "text-slate-900"}`}
+            <span
+              className={`font-medium ${row.tone === "success" ? "text-teal-600" : "text-gray-900"}`}
             >
               {row.value}
-            </motion.span>
+            </span>
           </div>
         ))}
       </div>
 
-      <div className="border-t border-dashed border-slate-200 bg-slate-50/70 px-5 py-4">
+      <div className="border-t border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between gap-4">
-          <span className="font-black text-slate-950">Total Payable</span>
-          <motion.span
-            key={summary.total}
-            initial={{ scale: 1.06 }}
-            animate={{ scale: 1 }}
-            className="text-xl font-black tabular-nums text-slate-950"
-          >
+          <span className="text-sm font-semibold text-gray-900">
+            Total Payable
+          </span>
+          <span className="text-lg font-bold text-gray-900">
             {fmt(summary.total)}
-          </motion.span>
+          </span>
         </div>
 
         {summary.totalSavings > 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-3 flex items-center gap-2 rounded-2xl border border-emerald-100 bg-emerald-50 px-3 py-2"
-          >
-            <Sparkles className="h-3.5 w-3.5 flex-shrink-0 text-emerald-600" />
-            <span className="text-xs font-black text-emerald-700">
-              You are saving {fmt(summary.totalSavings)} on this order.
-            </span>
-          </motion.div>
+          <p className="mt-2 text-xs text-teal-600">
+            You are saving {fmt(summary.totalSavings)} on this order.
+          </p>
         ) : null}
       </div>
 
-      <div className="px-5 pb-5 pt-4">
-        <motion.button
+      <div className="px-4 pb-4 pt-3">
+        <button
           type="button"
-          whileHover={{ scale: 1.01 }}
-          whileTap={{ scale: 0.98 }}
           onClick={onCheckout}
-          className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 py-4 text-sm font-black text-white shadow-lg shadow-teal-100 transition hover:from-teal-700 hover:to-emerald-700"
+          className="flex w-full items-center justify-center gap-2 rounded-md bg-teal-600 py-3 text-sm font-semibold text-white transition hover:bg-teal-700"
         >
           <Lock className="h-4 w-4" />
           Proceed to Checkout
-          <ChevronRight className="h-4 w-4" />
-        </motion.button>
+        </button>
 
         <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
           {["UPI", "Cards", "Net Banking", "COD", "Wallet"].map((method) => (
             <span
               key={method}
-              className="rounded-md bg-slate-100 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-400"
+              className="rounded border border-gray-200 px-2 py-0.5 text-[10px] font-medium text-gray-500"
             >
               {method}
             </span>
           ))}
         </div>
 
-        <p className="mt-2 flex items-center justify-center gap-1 text-center text-[10px] font-semibold text-slate-400">
+        <p className="mt-2 flex items-center justify-center gap-1 text-center text-[10px] text-gray-400">
           <Lock className="h-2.5 w-2.5" />
           256-bit SSL encrypted checkout
         </p>
@@ -432,25 +355,21 @@ function OrderSummary({ summary, onCheckout }) {
 
 function EmptyCart() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-[#fffaf0]">
       <div className="mx-auto flex max-w-xl flex-col items-center justify-center px-6 py-24 text-center">
-        <motion.div
-          animate={{ y: [0, -9, 0] }}
-          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-          className="mb-6 flex h-24 w-24 items-center justify-center rounded-[2rem] bg-white shadow-xl shadow-teal-100 ring-1 ring-slate-100"
-        >
-          <ShoppingCart className="h-10 w-10 text-teal-500" />
-        </motion.div>
-        <h1 className="text-2xl font-black text-slate-950">
+        <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-gray-200 bg-white">
+          <ShoppingCart className="h-9 w-9 text-teal-500" />
+        </div>
+        <h1 className="text-xl font-semibold text-gray-900">
           Your cart is empty
         </h1>
-        <p className="mt-3 max-w-sm text-sm font-medium leading-6 text-slate-500">
+        <p className="mt-2 max-w-sm text-sm text-gray-500">
           Looks like you have not added anything yet. Explore our care range and
           add your essentials.
         </p>
         <Link
           to="/"
-          className="mt-8 inline-flex items-center gap-2 rounded-2xl bg-teal-600 px-6 py-3 text-sm font-black text-white shadow-lg shadow-teal-100 transition hover:bg-teal-700"
+          className="mt-6 inline-flex items-center gap-2 rounded-md bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-teal-700"
         >
           Continue Shopping
           <ChevronRight className="h-4 w-4" />
@@ -674,117 +593,92 @@ export default function CartPage() {
   if (!cartItems.length) return <EmptyCart />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-teal-50/30">
-      <div className="mx-auto max-w-7xl px-4 py-7 sm:px-6 sm:py-10 lg:px-8">
-        <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-h-screen bg-[#f4faee]">
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-100 bg-white shadow-sm">
-                <ShoppingCart className="h-5 w-5 text-teal-600" />
-              </div>
-              <motion.span
-                key={displaySummary.totalItems}
-                initial={{ scale: 1.5 }}
-                animate={{ scale: 1 }}
-                className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-teal-600 text-[10px] font-black text-white shadow-sm"
-              >
+            <div className="relative flex h-10 w-10 items-center justify-center rounded-md border border-gray-200 bg-white">
+              <ShoppingCart className="h-5 w-5 text-teal-600" />
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-teal-600 text-[10px] font-bold text-white">
                 {displaySummary.totalItems}
-              </motion.span>
+              </span>
             </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-teal-600">
-                Secure cart
-              </p>
-              <h1 className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">
+              <h1 className="text-xl font-semibold text-gray-900">
                 Shopping Cart
               </h1>
-              <p className="mt-0.5 text-xs font-semibold text-slate-400">
+              <p className="text-xs text-gray-500">
                 {displaySummary.totalItems} item
                 {displaySummary.totalItems !== 1 ? "s" : ""} ready for checkout
               </p>
             </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            {clearConfirm ? (
-              <motion.div
-                key="confirm"
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex w-full items-center justify-between gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 sm:w-auto"
-              >
-                <span className="text-xs font-black text-rose-600">
-                  Clear all items?
-                </span>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={handleClearCart}
-                    className="rounded-xl bg-rose-500 px-3 py-1.5 text-xs font-black text-white transition hover:bg-rose-600"
-                  >
-                    Yes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setClearConfirm(false)}
-                    className="rounded-xl px-3 py-1.5 text-xs font-black text-slate-500 transition hover:bg-white"
-                  >
-                    No
-                  </button>
-                </div>
-              </motion.div>
-            ) : (
-              <motion.button
-                key="clear"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                type="button"
-                onClick={() => setClearConfirm(true)}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-black text-slate-400 transition hover:bg-rose-50 hover:text-rose-500"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                Clear cart
-              </motion.button>
-            )}
-          </AnimatePresence>
+          {clearConfirm ? (
+            <div className="flex w-full items-center justify-between gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 sm:w-auto">
+              <span className="text-xs font-medium text-rose-600">
+                Clear all items?
+              </span>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={handleClearCart}
+                  className="rounded bg-rose-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-600"
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setClearConfirm(false)}
+                  className="rounded px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-white"
+                >
+                  No
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setClearConfirm(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-medium text-gray-500 transition hover:bg-rose-50 hover:text-rose-500"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Clear cart
+            </button>
+          )}
         </div>
 
-        <div className="flex flex-col gap-6 xl:gap-8 lg:flex-row">
+        <div className="flex flex-col gap-6 lg:flex-row">
           <div className="min-w-0 flex-1 space-y-4">
             {!isMobile ? (
-              <div className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-sm">
-                <div className="grid grid-cols-[2.2fr_0.9fr_1fr_1fr_auto] gap-5 border-b border-slate-100 bg-slate-50/80 px-6 py-3.5">
+              <div className="overflow-hidden rounded-md border border-gray-200 bg-white">
+                <div className="grid grid-cols-[2.2fr_0.9fr_1fr_1fr_auto] gap-5 border-b border-gray-200 bg-gray-50 px-5 py-2.5">
                   {["Product", "Unit Price", "Quantity", "Total", ""].map(
                     (heading) => (
                       <div
                         key={heading}
-                        className="text-[10px] font-black uppercase tracking-widest text-slate-400"
+                        className="text-xs font-semibold uppercase tracking-wide text-gray-500"
                       >
                         {heading}
                       </div>
                     ),
                   )}
                 </div>
-                <AnimatePresence initial={false}>
-                  {cartItems.map((item) => (
-                    <CartItemDesktop
-                      key={`${item.id}-${item.packId || item.variantId || "default"}`}
-                      item={item}
-                    />
-                  ))}
-                </AnimatePresence>
+                {cartItems.map((item) => (
+                  <CartItemDesktop
+                    key={`${item.id}-${item.packId || item.variantId || "default"}`}
+                    item={item}
+                  />
+                ))}
               </div>
             ) : (
               <div className="space-y-3">
-                <AnimatePresence initial={false}>
-                  {cartItems.map((item) => (
-                    <CartItemMobile
-                      key={`${item.id}-${item.packId || item.variantId || "default"}`}
-                      item={item}
-                    />
-                  ))}
-                </AnimatePresence>
+                {cartItems.map((item) => (
+                  <CartItemMobile
+                    key={`${item.id}-${item.packId || item.variantId || "default"}`}
+                    item={item}
+                  />
+                ))}
               </div>
             )}
 
@@ -793,50 +687,47 @@ export default function CartPage() {
                 {
                   icon: ShieldCheck,
                   label: "Secure Payment",
-                  sub: "Cashfree protected",
-                  color: "bg-emerald-50 text-emerald-600",
+                  sub: "Protected Payments",
                 },
                 {
                   icon: Package,
                   label: "Easy Returns",
                   sub: "Simple return flow",
-                  color: "bg-blue-50 text-blue-600",
                 },
                 {
                   icon: Zap,
                   label: "Fast Dispatch",
                   sub: "Same day processing",
-                  color: "bg-amber-50 text-amber-600",
                 },
-              ].map(({ icon: Icon, label, sub, color }) => (
+              ].map(({ icon: Icon, label, sub }) => (
                 <div
                   key={label}
-                  className="rounded-3xl border border-slate-100 bg-white px-4 py-4 text-center shadow-sm"
+                  className="flex items-center gap-3 rounded-md border border-gray-200 bg-white px-4 py-3"
                 >
-                  <div
-                    className={`mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-2xl ${color}`}
-                  >
-                    <Icon className="h-4 w-4" />
+                  <Icon className="h-5 w-5 text-teal-600" />
+                  <div>
+                    <p className="text-xs font-semibold text-gray-800">
+                      {label}
+                    </p>
+                    <p className="text-[11px] text-gray-400">{sub}</p>
                   </div>
-                  <p className="text-xs font-black text-slate-800">{label}</p>
-                  <p className="mt-0.5 text-[11px] font-semibold text-slate-400">
-                    {sub}
-                  </p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex-shrink-0 space-y-3 lg:w-[380px] xl:w-[400px]">
+          <div className="flex-shrink-0 space-y-3 lg:w-[360px] lg:sticky lg:top-6 self-start">
             <ShippingProgress
               subtotal={displaySummary.subtotal}
               freeDeliveryThreshold={displaySummary.freeDeliveryThreshold}
             />
+
             <OrderSummary
               summary={displaySummary}
               onCheckout={handleCheckout}
               loading={summaryLoading}
             />
+
             <CouponBox
               coupons={availableCoupons}
               applied={coupon}
@@ -854,10 +745,10 @@ export default function CartPage() {
           </div>
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-6 text-center">
           <Link
-            to="/products"
-            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-black text-slate-400 transition hover:bg-white hover:text-teal-700"
+            to="/"
+            className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-gray-500 transition hover:bg-white hover:text-teal-700"
           >
             <ArrowLeft className="h-4 w-4" />
             Continue Shopping
@@ -865,16 +756,14 @@ export default function CartPage() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {toast ? (
-          <Toast
-            key={toast.id}
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        ) : null}
-      </AnimatePresence>
+      {toast ? (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      ) : null}
     </div>
   );
 }

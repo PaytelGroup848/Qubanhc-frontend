@@ -13,6 +13,7 @@ import {
 import toast from "react-hot-toast";
 
 import { adminService } from "../../../services/admin";
+import Pagination, { extractPagination } from "../../../components/Pagination";
 
 const STATUS_OPTIONS = [
   { value: "", label: "All Status" },
@@ -72,6 +73,12 @@ export default function Support() {
     priority: "",
     page: 1,
     limit: 10,
+  });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 1,
   });
 
   const [reply, setReply] = useState("");

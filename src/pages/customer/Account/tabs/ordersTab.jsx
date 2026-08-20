@@ -3,13 +3,19 @@ import { ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { orderService } from '../../../../services/order';
+import Pagination from '../../../../components/Pagination';
 import OrderCard from './orderCard';
 
 export default function OrdersTab() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 8,
+    total: 0,
+    totalPages: 1,
+  });
 
   const fetchOrders = useCallback(async (p = 1) => {
     try {
@@ -18,7 +24,13 @@ export default function OrdersTab() {
       const res = await orderService.getMyOrders(p, 8);
 
       setOrders(res.data?.orders || []);
-      setTotalPages(res.data?.pagination?.pages || 1);
+      const meta = res.data?.pagination || {};
+      setPagination({
+        page: meta.page || p,
+        limit: meta.limit || 8,
+        total: meta.total || (res.data?.orders || []).length,
+        totalPages: meta.pages || 1,
+      });
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to load orders');
     } finally {
@@ -76,29 +88,14 @@ export default function OrdersTab() {
         ))}
       </div>
 
-      {totalPages > 1 && (
-        <div className="mt-6 flex justify-center gap-3">
-          <button
-            disabled={page <= 1}
-            onClick={() => setPage((prev) => prev - 1)}
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold disabled:opacity-40 hover:bg-slate-50"
-          >
-            Prev
-          </button>
-
-          <span className="rounded-xl bg-slate-100 px-4 py-2 text-sm font-bold text-slate-600">
-            {page} / {totalPages}
-          </span>
-
-          <button
-            disabled={page >= totalPages}
-            onClick={() => setPage((prev) => prev + 1)}
-            className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold disabled:opacity-40 hover:bg-slate-50"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <Pagination
+        className="mt-6"
+        page={pagination.page}
+        totalPages={pagination.totalPages}
+        total={pagination.total}
+        limit={pagination.limit}
+        onPageChange={setPage}
+      />
     </div>
   );
 }

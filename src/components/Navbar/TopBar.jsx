@@ -8,8 +8,12 @@ export default function TopBar() {
         <span className="flex items-center gap-1.5">
           <TruckIcon /> Free shipping on orders above ₹1599
         </span>
-        <span className="hidden sm:flex items-center gap-1.5">📞 1800-123-4567</span>
-        <span className="hidden sm:flex items-center gap-1.5">Hygiene & Care you can trust</span>
+        <span className="hidden sm:flex items-center gap-1.5">
+          📞 9650245629
+        </span>
+        <span className="hidden sm:flex items-center gap-1.5">
+          Hygiene & Care you can trust
+        </span>
       </div>
     </div>
   );

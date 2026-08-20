@@ -1,24 +1,36 @@
-import { lazy, Suspense, useCallback, memo, useEffect, useState } from 'react';
-import Hero from './Hero';
-import NewsLetter from './NewsLetter';
-import Features from './Features';
-import { useCart } from '../../context/CartContext';
-import toast from 'react-hot-toast';
-import { productService } from '../../services/product';
-import { useNavigate } from 'react-router-dom';
-import { wishlistService } from '../../services/wishlist';
-import { useAuth } from '../../context/AuthContext';
+import { lazy, Suspense, useCallback, memo, useEffect, useState } from "react";
+import Hero from "./Hero";
+import NewsLetter from "./NewsLetter";
+import Features from "./Features";
+import { useCart } from "../../context/CartContext";
+import toast from "react-hot-toast";
+import { productService } from "../../services/product";
+import { useNavigate } from "react-router-dom";
+import { wishlistService } from "../../services/wishlist";
+import { useAuth } from "../../context/AuthContext";
+import Pagination, { extractPagination } from "../../components/Pagination";
 
-const FeaturedProducts = lazy(() => import('./FeaturedProucts/FeaturedProducts'));
+const FeaturedProducts = lazy(
+  () => import("./FeaturedProucts/FeaturedProducts"),
+);
 
-const SectionSkeleton = ({ height = 'h-[360px]' }) => (
-  <div className={`w-full ${height} animate-pulse rounded-[2rem] bg-gradient-to-br from-gray-100 via-teal-50 to-gray-100`} />
+const SectionSkeleton = ({ height = "h-[360px]" }) => (
+  <div
+    className={`w-full ${height} animate-pulse rounded-[2rem] bg-gradient-to-br from-gray-100 via-teal-50 to-gray-100`}
+  />
 );
 
 const CustomerPage = memo(() => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    totalPages: 1,
+  });
 
   const { addToCart } = useCart();
   const { isLoggedIn } = useAuth();
@@ -32,14 +44,26 @@ const CustomerPage = memo(() => {
         setLoading(true);
         setError(null);
 
-        const response = await productService.getAllProducts({ limit: 12 });
+        const response = await productService.getAllProducts({
+          page,
+          limit: 20,
+        });
         const payload = response?.data || response || {};
         const nextProducts = payload?.products || payload?.data?.products || [];
 
-        if (mounted) setProducts(Array.isArray(nextProducts) ? nextProducts : []);
+        if (mounted) {
+          setProducts(Array.isArray(nextProducts) ? nextProducts : []);
+          setPagination(
+            extractPagination(payload, {
+              page,
+              limit: 20,
+              total: Array.isArray(nextProducts) ? nextProducts.length : 0,
+            }),
+          );
+        }
       } catch (err) {
-        console.error('Error fetching products:', err);
-        if (mounted) setError('Failed to load products');
+        console.error("Error fetching products:", err);
+        if (mounted) setError("Failed to load products");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -50,76 +74,79 @@ const CustomerPage = memo(() => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [page]);
 
   const requireLogin = useCallback(
-    (from = '/') => {
+    (from = "/") => {
       if (isLoggedIn) return true;
 
-      navigate('/login', { state: { from } });
-      toast.error('Please login first');
+      navigate("/login", { state: { from } });
+      toast.error("Please login first");
       return false;
     },
-    [isLoggedIn, navigate]
+    [isLoggedIn, navigate],
   );
 
   const handleAddToCart = useCallback(
     async (productId) => {
-      if (!requireLogin('/')) return;
+      if (!requireLogin("/")) return;
 
       try {
         await addToCart({ id: productId }, 1);
-        window.dispatchEvent(new Event('cart-changed'));
-        toast.success('Added to cart!');
+        window.dispatchEvent(new Event("cart-changed"));
+        toast.success("Added to cart!");
       } catch (cartError) {
-        const message = cartError?.response?.data?.message || 'Failed to add to cart';
+        const message =
+          cartError?.response?.data?.message || "Failed to add to cart";
         toast.error(message);
       }
     },
-    [addToCart, requireLogin]
+    [addToCart, requireLogin],
   );
 
   const handleBuyNow = useCallback(
     async (productId) => {
-      if (!requireLogin('/checkout')) return;
+      if (!requireLogin("/checkout")) return;
 
       try {
         await addToCart({ id: productId }, 1);
-        window.dispatchEvent(new Event('cart-changed'));
-        navigate('/checkout');
+        window.dispatchEvent(new Event("cart-changed"));
+        navigate("/checkout");
       } catch (cartError) {
-        const message = cartError?.response?.data?.message || 'Unable to start checkout';
+        const message =
+          cartError?.response?.data?.message || "Unable to start checkout";
         toast.error(message);
       }
     },
-    [addToCart, navigate, requireLogin]
+    [addToCart, navigate, requireLogin],
   );
 
   const handleWishlistToggle = useCallback(
     async (productId, isCurrentlyWishlisted = false) => {
-      if (!requireLogin('/')) {
+      if (!requireLogin("/")) {
         return { success: false };
       }
 
       try {
         if (isCurrentlyWishlisted) {
           await wishlistService.removeFromWishlist(productId);
-          window.dispatchEvent(new Event('wishlist-changed'));
-          toast.success('Removed from wishlist');
+          window.dispatchEvent(new Event("wishlist-changed"));
+          toast.success("Removed from wishlist");
           return { success: true, isWishlisted: false };
         }
 
         await wishlistService.addToWishlist(productId);
-        window.dispatchEvent(new Event('wishlist-changed'));
-        toast.success('Added to wishlist');
+        window.dispatchEvent(new Event("wishlist-changed"));
+        toast.success("Added to wishlist");
         return { success: true, isWishlisted: true };
       } catch (wishlistError) {
-        const message = wishlistError?.response?.data?.message || 'Wishlist update failed';
+        const message =
+          wishlistError?.response?.data?.message || "Wishlist update failed";
         toast.error(message);
         return { success: false };
       }
     },
-    [requireLogin]
+    [requireLogin],
   );
 
   const hasError = error && products.length === 0;
@@ -127,7 +154,6 @@ const CustomerPage = memo(() => {
   return (
     <main className="min-h-screen overflow-hidden bg-white">
       <Hero />
-
 
       <section className="relative bg-gradient-to-b from-white to-gray-50 py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -140,7 +166,8 @@ const CustomerPage = memo(() => {
                 Featured Products
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500 sm:text-base">
-                Explore reliable healthcare products selected for comfort, quality and everyday care.
+                Explore reliable healthcare products selected for comfort,
+                quality and everyday care.
               </p>
             </div>
           </div>
@@ -168,6 +195,17 @@ const CustomerPage = memo(() => {
               />
             </Suspense>
           )}
+
+          {!hasError && pagination.totalPages > 1 ? (
+            <Pagination
+              className="mt-8"
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              total={pagination.total}
+              limit={pagination.limit}
+              onPageChange={setPage}
+            />
+          ) : null}
         </div>
       </section>
 
@@ -177,6 +215,6 @@ const CustomerPage = memo(() => {
   );
 });
 
-CustomerPage.displayName = 'CustomerPage';
+CustomerPage.displayName = "CustomerPage";
 
 export default CustomerPage;

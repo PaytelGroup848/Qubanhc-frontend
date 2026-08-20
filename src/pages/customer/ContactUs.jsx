@@ -4,7 +4,6 @@ import toast from "react-hot-toast";
 import { Mail, Phone, MapPin, Clock, Send, Loader2 } from "lucide-react";
 import contactService from "../../services/contact";
 
-
 export default function ContactUs() {
   const [form, setForm] = useState({
     name: "",
@@ -222,7 +221,7 @@ export default function ContactUs() {
                         Our Office
                       </p>
                       <p className="text-sm text-gray-500">
-                        123 QubanHC Tower, Sector 62, Noida, UP 201309, India
+                        A-47, GT KARNAL ROAD, AZADPUR, DELHI-110033, INDIA
                       </p>
                     </div>
                   </li>
@@ -231,10 +230,10 @@ export default function ContactUs() {
                     <div>
                       <p className="text-sm font-medium text-gray-800">Phone</p>
                       <a
-                        href="tel:+9118001234567"
+                        href="tel:+919650245629"
                         className="text-sm text-gray-500 hover:text-teal-600"
                       >
-                        1800-123-4567
+                        +91 9650245629
                       </a>
                     </div>
                   </li>
@@ -243,10 +242,10 @@ export default function ContactUs() {
                     <div>
                       <p className="text-sm font-medium text-gray-800">Email</p>
                       <a
-                        href="mailto:support@qubanhc.com"
+                        href="mailto:qubanhygienecare@gmail.com"
                         className="text-sm text-gray-500 hover:text-teal-600"
                       >
-                        support@qubanhc.com
+                        qubanhygienecare@gmail.com
                       </a>
                     </div>
                   </li>
@@ -267,13 +266,34 @@ export default function ContactUs() {
               </div>
 
               {/* Map Placeholder */}
+              {/* Office Location Map */}
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                <div className="aspect-video bg-gray-200 flex items-center justify-center">
-                  <div className="text-center p-4">
-                    <MapPin className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">
-                      Interactive map coming soon
-                    </p>
+                <div className="aspect-video">
+                  <iframe
+                    title="Our Office Location"
+                    src="https://www.google.com/maps?q=A-47%2C%20GT%20Karnal%20Road%2C%20Azadpur%2C%20Delhi%20110033%2C%20India&output=embed"
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
+
+                {/* Map Footer */}
+                <div className="p-4 border-t border-gray-100">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-teal-50 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-teal-600" />
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-semibold text-gray-800">
+                        Our Office
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        A-47, GT Karnal Road, Azadpur, Delhi - 110033, India
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

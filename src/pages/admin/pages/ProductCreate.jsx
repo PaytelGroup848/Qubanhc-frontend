@@ -55,6 +55,56 @@ export default function ProductCreate() {
     }
   };
 
+  const handleDescriptionKeyDown = (e) => {
+    if (e.key !== "Enter") return;
+
+    const { name, value, selectionStart, selectionEnd } = e.target;
+
+    const beforeCursor = value.slice(0, selectionStart);
+    const afterCursor = value.slice(selectionEnd);
+
+    const lines = beforeCursor.split("\n");
+    const currentLine = lines[lines.length - 1];
+
+    // Empty bullet par Enter → bullet remove karke new line
+    if (currentLine.trim() === "•") {
+      e.preventDefault();
+
+      lines.pop();
+
+      const newValue = [...lines, "", afterCursor].join("\n");
+
+      setForm((prev) => ({
+        ...prev,
+        [name]: newValue,
+      }));
+
+      requestAnimationFrame(() => {
+        const position = lines.join("\n").length + 1;
+        e.target.selectionStart = position;
+        e.target.selectionEnd = position;
+      });
+
+      return;
+    }
+
+    // Normal Enter → next line with bullet
+    e.preventDefault();
+
+    const newValue = `${beforeCursor}\n• ${afterCursor}`;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+
+    requestAnimationFrame(() => {
+      const newPosition = selectionStart + 3;
+      e.target.selectionStart = newPosition;
+      e.target.selectionEnd = newPosition;
+    });
+  };
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -342,9 +392,10 @@ export default function ProductCreate() {
                 name="description"
                 value={form.description}
                 onChange={handleChange}
+                onKeyDown={handleDescriptionKeyDown}
                 rows={5}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all resize-y"
-                placeholder="Detailed product description..."
+                placeholder="Write description. Press Enter for bullet points..."
               />
             </div>
 

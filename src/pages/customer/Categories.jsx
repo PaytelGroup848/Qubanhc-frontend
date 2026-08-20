@@ -7,7 +7,7 @@ import { categoryService } from "../../services/category";
 
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
-  "http://localhost:5000" ||
+  // "http://localhost:5000" ||
   "https://qubanhygienecare.com";
 
 const fallbackCategories = [
