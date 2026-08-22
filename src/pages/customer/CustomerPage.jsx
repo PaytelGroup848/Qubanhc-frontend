@@ -208,7 +208,6 @@ const CustomerPage = memo(() => {
           ) : null}
         </div>
       </section>
-
       <Features />
       <NewsLetter />
     </main>

@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { adminService } from '../../../services/admin';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { adminService } from "../../../services/admin";
+import toast from "react-hot-toast";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const MAX_FILE_SIZE_MB = 5;
-const ALLOWED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 // ─── Helper: convert File → base64 string ────────────────────────────────────
 const fileToBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onloadend = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.onerror = () => reject(new Error("Failed to read file"));
     reader.readAsDataURL(file);
   });
 
@@ -21,23 +21,23 @@ export default function CategoryCreate() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [categories, setCategories] = useState([]);
 
   // Image state
   const [imagePreview, setImagePreview] = useState(null); // For <img src>
-  const [imageBase64, setImageBase64] = useState(null);   // ✅ Pure base64 string to send to backend
-  const [imageError, setImageError] = useState('');
+  const [imageBase64, setImageBase64] = useState(null); // ✅ Pure base64 string to send to backend
+  const [imageError, setImageError] = useState("");
 
   const [form, setForm] = useState({
-    name: '',
-    description: '',
-    parent: '',
+    name: "",
+    description: "",
+    parent: "",
     displayOrder: 0,
     isFeatured: false,
     seo: {
-      metaTitle: '',
-      metaDescription: '',
+      metaTitle: "",
+      metaDescription: "",
       keywords: [],
     },
   });
@@ -52,7 +52,7 @@ export default function CategoryCreate() {
       const response = await adminService.getCategories();
       setCategories(response.data?.categories || []);
     } catch (err) {
-      console.error('Error fetching categories:', err);
+      console.error("Error fetching categories:", err);
       setCategories([]);
     } finally {
       setPageLoading(false);
@@ -63,8 +63,8 @@ export default function CategoryCreate() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (name.startsWith('seo.')) {
-      const seoField = name.split('.')[1];
+    if (name.startsWith("seo.")) {
+      const seoField = name.split(".")[1];
       setForm((prev) => ({
         ...prev,
         seo: { ...prev.seo, [seoField]: value },
@@ -74,7 +74,7 @@ export default function CategoryCreate() {
 
     setForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -83,11 +83,11 @@ export default function CategoryCreate() {
     const file = e.target.files[0];
     if (!file) return;
 
-    setImageError('');
+    setImageError("");
 
     // Validate type
     if (!ALLOWED_TYPES.includes(file.type)) {
-      setImageError('Only JPG, PNG, and WEBP images are allowed');
+      setImageError("Only JPG, PNG, and WEBP images are allowed");
       return;
     }
 
@@ -99,28 +99,30 @@ export default function CategoryCreate() {
 
     try {
       const base64 = await fileToBase64(file);
-      setImageBase64(base64);   // ✅ This is what we send to backend
-      setImagePreview(base64);  // This is for <img> preview
+      setImageBase64(base64); // ✅ This is what we send to backend
+      setImagePreview(base64); // This is for <img> preview
     } catch {
-      setImageError('Failed to process image. Please try again.');
+      setImageError("Failed to process image. Please try again.");
     }
 
     // Reset input so same file can be re-selected
-    e.target.value = '';
+    e.target.value = "";
   };
 
   // ─── Remove image ───────────────────────────────────────────────────────────
   const removeImage = () => {
     setImageBase64(null);
     setImagePreview(null);
-    setImageError('');
+    setImageError("");
   };
 
   // ─── Validation ─────────────────────────────────────────────────────────────
   const validate = () => {
-    if (!form.name.trim()) return 'Category name is required';
-    if (form.name.trim().length < 2) return 'Category name must be at least 2 characters';
-    if (form.name.length > 100) return 'Category name cannot exceed 100 characters';
+    if (!form.name.trim()) return "Category name is required";
+    if (form.name.trim().length < 2)
+      return "Category name must be at least 2 characters";
+    if (form.name.length > 100)
+      return "Category name cannot exceed 100 characters";
     return null;
   };
 
@@ -135,19 +137,19 @@ export default function CategoryCreate() {
       return;
     }
 
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       const categoryData = {
         name: form.name.trim(),
-        description: form.description?.trim() || '',
+        description: form.description?.trim() || "",
         parent: form.parent || null,
         displayOrder: parseInt(form.displayOrder) || 0,
         isFeatured: form.isFeatured || false,
         seo: {
-          metaTitle: form.seo.metaTitle?.trim() || '',
-          metaDescription: form.seo.metaDescription?.trim() || '',
+          metaTitle: form.seo.metaTitle?.trim() || "",
+          metaDescription: form.seo.metaDescription?.trim() || "",
           keywords: form.seo.keywords?.filter((k) => k.trim()) || [],
         },
       };
@@ -160,10 +162,10 @@ export default function CategoryCreate() {
       }
 
       await adminService.createCategory(categoryData);
-      toast.success('Category created successfully! 🎉');
-      navigate('/admin/categories');
+      toast.success("Category created successfully! 🎉");
+      navigate("/admin/categories");
     } catch (err) {
-      const message = err.response?.data?.message || 'Something went wrong';
+      const message = err.response?.data?.message || "Something went wrong";
       setError(message);
       toast.error(message);
     } finally {
@@ -185,11 +187,21 @@ export default function CategoryCreate() {
     <div className="max-w-5xl mx-auto">
       {/* Back button */}
       <button
-        onClick={() => navigate('/admin/categories')}
+        onClick={() => navigate("/admin/categories")}
         className="flex items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors mb-6"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         Back to Categories
       </button>
@@ -197,7 +209,9 @@ export default function CategoryCreate() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Add New Category</h1>
-        <p className="text-sm text-gray-500 mt-1">Create a product category with image and SEO support</p>
+        <p className="text-sm text-gray-500 mt-1">
+          Create a product category with image and SEO support
+        </p>
       </div>
 
       {error && (
@@ -226,14 +240,17 @@ export default function CategoryCreate() {
                 onChange={handleChange}
                 maxLength={100}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                placeholder="e.g. Baby Care"
               />
-              <p className="text-xs text-gray-400 mt-1">{form.name.length}/100 characters</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {form.name.length}/100 characters
+              </p>
             </div>
 
             {/* Parent Category */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Parent Category</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Parent Category
+              </label>
               <select
                 name="parent"
                 value={form.parent}
@@ -243,7 +260,7 @@ export default function CategoryCreate() {
                 <option value="">None (Top Level)</option>
                 {categories.map((cat) => (
                   <option key={cat._id} value={cat._id}>
-                    {'— '.repeat(Math.max(0, (cat.level || 1) - 1))}
+                    {"— ".repeat(Math.max(0, (cat.level || 1) - 1))}
                     {cat.name}
                   </option>
                 ))}
@@ -253,7 +270,9 @@ export default function CategoryCreate() {
 
             {/* Display Order */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Display Order</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Display Order
+              </label>
               <input
                 type="number"
                 name="displayOrder"
@@ -261,14 +280,17 @@ export default function CategoryCreate() {
                 onChange={handleChange}
                 min="0"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                placeholder="0"
               />
-              <p className="text-xs text-gray-400 mt-1">Lower numbers appear first</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Lower numbers appear first
+              </p>
             </div>
 
             {/* Featured toggle */}
             <div className="flex items-center gap-3 pt-5">
-              <label className="text-sm font-medium text-gray-700">Featured Category</label>
+              <label className="text-sm font-medium text-gray-700">
+                Featured Category
+              </label>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
@@ -279,12 +301,16 @@ export default function CategoryCreate() {
                 />
                 <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-teal-600 peer-focus:ring-2 peer-focus:ring-teal-500 after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full" />
               </label>
-              <span className="text-sm text-gray-500">{form.isFeatured ? 'Yes' : 'No'}</span>
+              <span className="text-sm text-gray-500">
+                {form.isFeatured ? "Yes" : "No"}
+              </span>
             </div>
 
             {/* Description */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
               <textarea
                 name="description"
                 value={form.description}
@@ -292,9 +318,10 @@ export default function CategoryCreate() {
                 rows={3}
                 maxLength={500}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all resize-y"
-                placeholder="Brief description of this category..."
               />
-              <p className="text-xs text-gray-400 mt-1">{form.description?.length || 0}/500 characters</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {form.description?.length || 0}/500 characters
+              </p>
             </div>
           </div>
         </div>
@@ -320,17 +347,41 @@ export default function CategoryCreate() {
                     onClick={removeImage}
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition shadow"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
               ) : (
                 <div className="w-40 h-40 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center bg-gray-50 text-gray-400">
-                  <svg className="w-10 h-10 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <svg
+                    className="w-10 h-10 mb-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    />
                   </svg>
-                  <span className="text-xs text-center">No image<br />selected</span>
+                  <span className="text-xs text-center">
+                    No image
+                    <br />
+                    selected
+                  </span>
                 </div>
               )}
             </div>
@@ -338,10 +389,20 @@ export default function CategoryCreate() {
             {/* Upload controls */}
             <div className="flex flex-col gap-3">
               <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium w-fit">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                  />
                 </svg>
-                {imagePreview ? 'Change Image' : 'Upload Image'}
+                {imagePreview ? "Change Image" : "Upload Image"}
                 <input
                   type="file"
                   accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -356,8 +417,18 @@ export default function CategoryCreate() {
                   onClick={removeImage}
                   className="inline-flex items-center gap-2 px-4 py-2.5 border border-red-300 text-red-500 rounded-lg hover:bg-red-50 transition-colors text-sm font-medium w-fit"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    />
                   </svg>
                   Remove Image
                 </button>
@@ -375,8 +446,16 @@ export default function CategoryCreate() {
 
               {imageBase64 && (
                 <p className="text-xs text-green-600 font-medium flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   Image ready to upload
                 </p>
@@ -394,7 +473,9 @@ export default function CategoryCreate() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Meta Title */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Title
+              </label>
               <input
                 type="text"
                 name="seo.metaTitle"
@@ -402,31 +483,41 @@ export default function CategoryCreate() {
                 onChange={handleChange}
                 maxLength={60}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                placeholder="Best Baby Care Products"
               />
-              <p className="text-xs text-gray-400 mt-1">{form.seo.metaTitle?.length || 0}/60 characters</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {form.seo.metaTitle?.length || 0}/60 characters
+              </p>
             </div>
 
             {/* Keywords */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Keywords</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Keywords
+              </label>
               <input
                 type="text"
                 name="seo.keywords"
-                value={form.seo.keywords?.join(', ') || ''}
+                value={form.seo.keywords?.join(", ") || ""}
                 onChange={(e) => {
-                  const keywords = e.target.value.split(',').map((k) => k.trim()).filter(Boolean);
-                  setForm((prev) => ({ ...prev, seo: { ...prev.seo, keywords } }));
+                  const keywords = e.target.value
+                    .split(",")
+                    .map((k) => k.trim())
+                    .filter(Boolean);
+                  setForm((prev) => ({
+                    ...prev,
+                    seo: { ...prev.seo, keywords },
+                  }));
                 }}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
-                placeholder="baby, diapers, care"
               />
               <p className="text-xs text-gray-400 mt-1">Separate with commas</p>
             </div>
 
             {/* Meta Description */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Meta Description
+              </label>
               <textarea
                 name="seo.metaDescription"
                 value={form.seo.metaDescription}
@@ -434,9 +525,10 @@ export default function CategoryCreate() {
                 rows={2}
                 maxLength={160}
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all resize-y"
-                placeholder="Discover premium baby care products..."
               />
-              <p className="text-xs text-gray-400 mt-1">{form.seo.metaDescription?.length || 0}/160 characters</p>
+              <p className="text-xs text-gray-400 mt-1">
+                {form.seo.metaDescription?.length || 0}/160 characters
+              </p>
             </div>
           </div>
         </div>
@@ -450,16 +542,41 @@ export default function CategoryCreate() {
           >
             {loading ? (
               <>
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                <svg
+                  className="animate-spin h-4 w-4"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
                 Creating...
               </>
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
                 </svg>
                 Create Category
               </>
@@ -468,7 +585,7 @@ export default function CategoryCreate() {
 
           <button
             type="button"
-            onClick={() => navigate('/admin/categories')}
+            onClick={() => navigate("/admin/categories")}
             className="px-6 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
           >
             Cancel

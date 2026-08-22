@@ -1,3 +1,5 @@
+import { BookOpenCheck } from "lucide-react";
+
 export const ADMIN_MODULES = [
   {
     id: "categories",
@@ -28,6 +30,20 @@ export const ADMIN_MODULES = [
     id: "get_in_touch",
     label: "Get in Touch",
     path: "/admin/get-in-touch",
+  },
+  {
+    id: "banners",
+    label: "Banners",
+    icon: Image,
+    path: "/admin/banners",
+    moduleId: "banners",
+  },
+  {
+    id: "blogs",
+    label: "Blogs",
+    icon: BookOpenCheck,
+    path: "/admin/blogs",
+    moduleId: "blogs",
   },
 ];
 
@@ -81,6 +97,20 @@ export const SUPER_ADMIN_MENUS = [
     id: "get_in_touch",
     label: "Get in Touch",
     path: "/admin/get-in-touch",
+  },
+  {
+    id: "banners",
+    label: "Banners",
+    icon: Image,
+    path: "/admin/banners",
+    moduleId: "banners",
+  },
+  {
+    id: "blogs",
+    label: "Blogs",
+    icon: BookOpenCheck,
+    path: "/admin/blogs",
+    moduleId: "blogs",
   },
   {
     id: "settings",
@@ -158,5 +188,7 @@ export const getModuleByPath = (pathname = "") => {
   if (pathname.startsWith("/admin/customers")) return "customers";
   if (pathname.startsWith("/admin/support")) return "support";
   if (pathname.startsWith("/admin/get-in-touch")) return "get_in_touch";
+  if (pathname.startsWith("/admin/banners")) return "banners";
+  if (pathname.startsWith("/admin/blogs")) return "blogs";
   return null;
 };

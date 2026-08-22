@@ -24,13 +24,20 @@ import CartPage from "./pages/customer/Cart/CartPage";
 import CheckoutPage from "./pages/customer/Checkout/CheckoutPage";
 import WishlistPage from "./pages/customer/WishlistPage/WishlistPage";
 import ContactUs from "./pages/customer/ContactUs";
+import SearchPage from "./pages/customer/Search/SearchPage";
 import CashfreeSuccess from "./pages/customer/payment/CashfreeSuccess";
-import MySupport from "./pages/customer/Support/MySupport";
-import SupportTicketDetail from "./pages/customer/Support/SupportTicketDetail";
-import QubanHCBlogPage from "./pages/customer/blogPage";
+// import RazorpaySuccess from "./pages/customer/payment/RazorpaySuccess";
+
+// Remove this duplicate import - you already have BlogListing and BlogPage below
+// import QubanHCBlogPage from "./pages/customer/blogPage";
 
 import InvoicePage from "./components/invoice/invoice";
-import SearchPage from "./pages/customer/Search/SearchPage";
+// import MySupport from "./pages/customer/Category/support/mySupport";
+import MySupport from "./pages/customer/Support/MySupport";
+// import SupportTicketDetail from "./pages/customer/Category/support/supportTicketDetail";
+import SupportTicketDetail from "./pages/customer/Support/SupportTicketDetail";
+import BlogListing from "./pages/customer/BlogListing";
+import BlogPage from "./pages/customer/blogPage";
 
 // ---------- Admin imports lazy ----------
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
@@ -79,15 +86,6 @@ export default function App() {
                 }
               />
               <Route
-                path="/blog"
-                element={
-                  <PublicRoute>
-                    <QubanHCBlogPage />
-                  </PublicRoute>
-                }
-              />
-
-              <Route
                 path="/register"
                 element={
                   <PublicRoute>
@@ -133,7 +131,11 @@ export default function App() {
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/search" element={<SearchPage />} />
-                {/*  support routes */}
+
+                <Route path="/blog" element={<BlogListing />} />
+                <Route path="/blog/:slug" element={<BlogPage />} />
+
+                {/* Support routes */}
                 <Route
                   path="/account/support"
                   element={
@@ -150,6 +152,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
+
                 {/* Protected customer pages */}
                 <Route
                   path="/wishlist"
@@ -175,7 +178,7 @@ export default function App() {
                     </ProtectedRoute>
                   }
                 />
-                {/* ✅ Customer Invoice Page */}
+                {/* Customer Invoice Page */}
                 <Route
                   path="/account/orders/:id/invoice"
                   element={

@@ -1,7 +1,7 @@
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
-  //  || "http://localhost:5000";
-  "https://qubanhygienecare.com";
+  "https://qubanhygienecare.com" ||
+  "http://localhost:5000";
 
 export const getImageUrl = (url) => {
   if (!url) return "/images/placeholder.jpg";

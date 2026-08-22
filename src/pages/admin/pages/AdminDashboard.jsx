@@ -15,7 +15,7 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { IndianRupee, ShoppingCart } from "lucide-react";
+import { HandPlatter, IndianRupee, ShoppingCart, Users } from "lucide-react";
 
 const COLORS = ["#4f46e5", "#0ea5e9", "#64748b", "#94a3b8"];
 
@@ -64,27 +64,23 @@ export default function Dashboard() {
         <KpiCard
           title="Total Revenue"
           value={`₹${stats.totalRevenue?.toLocaleString() || 0}`}
-          change="+12%"
           icon={<IndianRupee className="text-yellow-600" />}
         />
         <KpiCard
           title="Total Orders"
           value={stats.totalOrders || 0}
-          change="+8%"
-          icon={<ShoppingCart />}
+          icon={<ShoppingCart className="text-green-600" />}
         />
         <KpiCard
           title="Active Vendors"
           value={stats.activeVendors || 0}
-          change="+5%"
-          icon="🏪"
+          icon={<HandPlatter className="text-blue-600" />}
         />
-        <KpiCard
+        {/* <KpiCard
           title="Customers"
           value={stats.totalCustomers || 0}
-          change="+15%"
-          icon="👥"
-        />
+          icon={<Users className="text-indigo-600" />}
+        /> */}
       </div>
 
       <div className="flex flex-wrap gap-3 mb-8">

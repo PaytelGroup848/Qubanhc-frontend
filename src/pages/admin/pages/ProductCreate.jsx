@@ -481,9 +481,9 @@ export default function ProductCreate() {
               >
                 <option value="none">None</option>
                 <option value="gst_5">GST 5%</option>
-                <option value="gst_12">GST 12%</option>
+                {/* <option value="gst_12">GST 12%</option> */}
                 <option value="gst_18">GST 18%</option>
-                <option value="gst_28">GST 28%</option>
+                {/* <option value="gst_28">GST 28%</option> */}
               </select>
             </div>
           </div>

@@ -12,7 +12,10 @@ export const authService = {
     const response = await api.post('/auth/login', credentials);
     if (response.data.data?.accessToken) {
       localStorage.setItem('accessToken', response.data.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.data.refreshToken);
+      const rToken = response.data.data.refreshToken;
+      if (rToken && rToken !== 'undefined' && rToken !== 'null') {
+        localStorage.setItem('refreshToken', rToken);
+      }
       localStorage.setItem('user', JSON.stringify(response.data.data.user));
     }
     return response.data;

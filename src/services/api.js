@@ -125,8 +125,13 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem("refreshToken");
+        const isValidToken =
+          refreshToken &&
+          refreshToken !== "undefined" &&
+          refreshToken !== "null" &&
+          refreshToken.trim().length > 0;
 
-        if (!refreshToken) {
+        if (!isValidToken) {
           throw new Error("No refresh token available");
         }
 
@@ -134,6 +139,9 @@ api.interceptors.response.use(
           `${API_BASE_URL}/auth/refresh-token`,
           {
             refreshToken,
+          },
+          {
+            withCredentials: true,
           },
         );
 

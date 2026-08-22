@@ -16,6 +16,8 @@ import InvoicePage from "../../components/invoice/invoice";
 import OrderDetails from "./pages/orderDetails";
 import Support from "./pages/support";
 import GetInTouch from "./pages/getInTouch";
+import BannerManagement from "./pages/BannerManagement";
+import BlogManagement from "./pages/BlogManagement";
 
 const AdminLogin = lazy(() => import("./AdminLogin"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
@@ -134,6 +136,24 @@ export default function AdminRoutes() {
             element={
               <ModuleGuard moduleId="products">
                 <Products />
+              </ModuleGuard>
+            }
+          />
+
+          <Route
+            path="banners"
+            element={
+              <ModuleGuard moduleId="banners">
+                <BannerManagement />
+              </ModuleGuard>
+            }
+          />
+
+          <Route
+            path="blogs"
+            element={
+              <ModuleGuard moduleId="blogs">
+                <BlogManagement />
               </ModuleGuard>
             }
           />
