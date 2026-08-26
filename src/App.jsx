@@ -38,6 +38,9 @@ import MySupport from "./pages/customer/Support/MySupport";
 import SupportTicketDetail from "./pages/customer/Support/SupportTicketDetail";
 import BlogListing from "./pages/customer/BlogListing";
 import BlogPage from "./pages/customer/blogPage";
+import About from "./components/About";
+import Privacy from "./components/Privacy";
+import Terms from "./components/Terms";
 
 // ---------- Admin imports lazy ----------
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
@@ -131,6 +134,9 @@ export default function App() {
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/contact" element={<ContactUs />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/terms" element={<Terms />} />
 
                 <Route path="/blog" element={<BlogListing />} />
                 <Route path="/blog/:slug" element={<BlogPage />} />

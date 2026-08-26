@@ -105,23 +105,23 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/careers"
+                  // to="/careers"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Careers
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/press"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Press
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
-                  to="/sitemap"
+                  // to="/sitemap"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Sitemap
@@ -138,23 +138,23 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  to="/help"
+                  to="/contact"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Help Center
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <Link
                   to="/returns"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Returns & Refunds
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
-                  to="/shipping"
+                  to="/account"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Shipping Info
@@ -162,7 +162,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/track-order"
+                  to="/account"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Track Order
@@ -170,7 +170,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/faq"
+                  // to="/faq"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   FAQs
@@ -211,7 +211,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/orders"
+                  to="/account"
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   My Orders
@@ -219,7 +219,8 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/settings"
+                  to="/account
+                  "
                   className="text-sm text-slate-300 hover:text-white transition-colors"
                 >
                   Settings
@@ -264,9 +265,9 @@ export default function Footer() {
             <Link to="/terms" className="hover:text-white transition-colors">
               Terms of Service
             </Link>
-            <Link to="/cookies" className="hover:text-white transition-colors">
+            {/* <Link to="/cookies" className="hover:text-white transition-colors">
               Cookie Policy
-            </Link>
+            </Link> */}
           </div>
           <div className="flex items-center gap-3 text-white/70">
             <span className="text-xs font-medium tracking-wide">
