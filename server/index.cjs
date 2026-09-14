@@ -29,6 +29,8 @@ const OTP_STORE = new Map();
 const USER_STORE = new Map();
 const PENDING_USERS = new Map();
 
+const emailDeliveryConfigured = Boolean(BREVO_API_KEY && BREVO_SENDER_EMAIL);
+
 function makeOtp() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
@@ -47,9 +49,15 @@ function generateRefreshToken(user) {
 
 function sendOtpEmail(email, otp) {
   if (!BREVO_API_KEY) {
-    console.log(`\n[DEV OTP] Email: ${email}`);
-    console.log(`[DEV OTP] OTP: ${otp}\n`);
-    return Promise.resolve({ devMode: true });
+    if (ALLOW_DEV_OTP) {
+      console.log(`\n[DEV OTP] Email: ${email}`);
+      console.log(`[DEV OTP] OTP: ${otp}\n`);
+      return Promise.resolve({ devMode: true });
+    }
+
+    const error = new Error('Brevo email delivery is not configured.');
+    error.code = 'EMAIL_NOT_CONFIGURED';
+    throw error;
   }
 
   console.log(`[BREVO] Sending OTP email to ${email} via sender ${BREVO_SENDER_EMAIL}`);
@@ -107,8 +115,24 @@ app.use(
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true, message: 'Backend is running' });
+  res.json({
+    ok: true,
+    message: 'Backend is running',
+    emailDeliveryConfigured,
+  });
 });
+
+function getEmailDeliveryError(error) {
+  if (error?.code === 'EMAIL_NOT_CONFIGURED') {
+    return 'OTP email delivery is not configured. Set BREVO_API_KEY and BREVO_SENDER_EMAIL on the backend.';
+  }
+
+  if (error?.response?.data?.message) {
+    return `OTP email delivery failed: ${error.response.data.message}`;
+  }
+
+  return 'OTP email delivery failed. Please try again later.';
+}
 
 app.post('/api/v1/auth/register', async (req, res) => {
   try {
@@ -152,9 +176,8 @@ app.post('/api/v1/auth/register', async (req, res) => {
     });
   } catch (error) {
     console.error('REGISTER ERROR:', error.response?.data || error.message);
-    return res.status(500).json({
-      message: 'Registration failed. Please try again.',
-    });
+    const emailError = error.code === 'EMAIL_NOT_CONFIGURED' || error.response?.status >= 400;
+    return res.status(emailError ? 503 : 500).json({ message: getEmailDeliveryError(error) });
   }
 });
 
@@ -243,7 +266,8 @@ app.post('/api/v1/auth/resend-otp', async (req, res) => {
     });
   } catch (error) {
     console.error('RESEND OTP ERROR:', error.response?.data || error.message);
-    return res.status(500).json({ message: 'Failed to resend OTP.' });
+    const emailError = error.code === 'EMAIL_NOT_CONFIGURED' || error.response?.status >= 400;
+    return res.status(emailError ? 503 : 500).json({ message: getEmailDeliveryError(error) });
   }
 });
 
