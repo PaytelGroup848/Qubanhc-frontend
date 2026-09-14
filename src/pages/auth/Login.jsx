@@ -41,6 +41,10 @@ const Login = () => {
   const [serverError, setServerError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verificationRequired, setVerificationRequired] = useState(false);
+  const [verificationOtp, setVerificationOtp] = useState('');
+  const [verificationError, setVerificationError] = useState('');
+  const [verificationLoading, setVerificationLoading] = useState(false);
 
   const isFormValid = useMemo(() => {
     return (
@@ -145,13 +149,64 @@ const Login = () => {
 
       login(user);
       toast.success(`Welcome back, ${user.name}!`);
-      navigate(from || '/', { replace: true });
+      navigate('/', { replace: true });
     } catch (error) {
+      const errorMessage = error.response?.data?.message || '';
+      if (
+        error.response?.status === 403 &&
+        errorMessage.toLowerCase().includes('not verified')
+      ) {
+        setVerificationRequired(true);
+        setVerificationError(errorMessage);
+        return;
+      }
+
       const message = getFriendlyError(error);
       setServerError(message);
       toast.error(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyLogin = async (e) => {
+    e.preventDefault();
+
+    if (verificationOtp.length !== 6) {
+      setVerificationError('Please enter the 6-digit OTP.');
+      return;
+    }
+
+    setVerificationLoading(true);
+    setVerificationError('');
+
+    try {
+      const email = formData.email.trim().toLowerCase();
+      await authService.verifyEmail(email, verificationOtp);
+      const response = await authService.login({
+        email,
+        password: formData.password,
+        allowedRoles: ['customer'],
+      });
+      const user = response.data?.user;
+
+      if (!user || user.role !== 'customer') {
+        authService.clearAuthData();
+        throw new Error('Please use customer login.');
+      }
+
+      login(user);
+      setVerificationRequired(false);
+      toast.success(`Welcome back, ${user.name}!`);
+      navigate('/', { replace: true });
+    } catch (error) {
+      setVerificationError(
+        error.response?.data?.message ||
+          error.message ||
+          'Verification failed. Please check the OTP and try again.',
+      );
+    } finally {
+      setVerificationLoading(false);
     }
   };
 
@@ -194,6 +249,37 @@ const Login = () => {
             <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
               <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
               <span>{serverError}</span>
+            </div>
+          )}
+
+          {verificationRequired && (
+            <div className="mb-5 rounded-xl border border-teal-200 bg-teal-50 px-4 py-4">
+              <h3 className="font-semibold text-teal-900">Verify your email</h3>
+              <p className="mt-1 text-sm text-teal-800">
+                {verificationError || 'Enter the new OTP sent to your email.'}
+              </p>
+              <form onSubmit={handleVerifyLogin} className="mt-4 space-y-3">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  value={verificationOtp}
+                  onChange={(event) => {
+                    setVerificationOtp(event.target.value.replace(/\D/g, '').slice(0, 6));
+                    setVerificationError('');
+                  }}
+                  placeholder="Enter 6-digit OTP"
+                  className="w-full rounded-lg border border-teal-200 bg-white px-4 py-3 text-center tracking-[0.35em] outline-none focus:ring-2 focus:ring-teal-500"
+                  aria-label="Email verification OTP"
+                />
+                <button
+                  type="submit"
+                  disabled={verificationLoading || verificationOtp.length !== 6}
+                  className="w-full rounded-lg bg-teal-600 py-3 font-semibold text-white transition-colors hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {verificationLoading ? 'Verifying...' : 'Verify and sign in'}
+                </button>
+              </form>
             </div>
           )}
 

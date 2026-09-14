@@ -1,7 +1,11 @@
 import api from './api';
+import { authService } from './auth';
 
 export const cartService = {
   getCart: async () => {
+    if (!authService.isStorefrontAuthenticated()) {
+      return { data: { cart: { items: [] } } };
+    }
     const response = await api.get('/cart');
     return response.data;
   },
@@ -55,6 +59,9 @@ export const cartService = {
 
   // ✅ CartPage ke admin/pricing summary ke liye
   getCartSummary: async (couponCode = '') => {
+    if (!authService.isStorefrontAuthenticated()) {
+      return { data: { summary: null } };
+    }
     const response = await api.get('/cart/summary', {
       params: couponCode ? { couponCode } : {},
     });

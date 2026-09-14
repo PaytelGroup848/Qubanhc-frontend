@@ -48,7 +48,7 @@ export function CartProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const syncGuestCartToBackend = useCallback(async () => {
-    if (!authService.isAuthenticated()) return;
+    if (!authService.isStorefrontAuthenticated()) return;
     const guestItems = readGuestCart();
     if (guestItems.length === 0) return;
 
@@ -63,7 +63,7 @@ export function CartProvider({ children }) {
   const fetchCart = useCallback(async () => {
     setLoading(true);
 
-    if (!authService.isAuthenticated()) {
+    if (!authService.isStorefrontAuthenticated()) {
       setCartItems(readGuestCart());
       setLoading(false);
       return;
@@ -99,7 +99,7 @@ export function CartProvider({ children }) {
     const productId = getProductId(product);
     if (!productId) throw new Error('Product id is required');
 
-    if (!authService.isAuthenticated()) {
+    if (!authService.isStorefrontAuthenticated()) {
       const nextItem = buildLocalItem(product, quantity, variantId);
       const existingItems = readGuestCart();
       const existing = existingItems.find(
@@ -127,7 +127,7 @@ export function CartProvider({ children }) {
   const updateQuantity = useCallback(async (productId, packId, newQuantity) => {
     const safeQuantity = Math.max(1, newQuantity);
 
-    if (!authService.isAuthenticated()) {
+    if (!authService.isStorefrontAuthenticated()) {
       const updated = readGuestCart().map((item) =>
         item.id === productId && (item.packId || null) === (packId || null)
           ? { ...item, quantity: safeQuantity }
@@ -147,7 +147,7 @@ export function CartProvider({ children }) {
   }, [cartItems, fetchCart]);
 
   const removeFromCart = useCallback(async (productId, packId) => {
-    if (!authService.isAuthenticated()) {
+    if (!authService.isStorefrontAuthenticated()) {
       const updated = readGuestCart().filter(
         (item) => !(item.id === productId && (item.packId || null) === (packId || null))
       );
@@ -165,7 +165,7 @@ export function CartProvider({ children }) {
   }, [cartItems, fetchCart]);
 
   const clearCart = useCallback(async () => {
-    if (!authService.isAuthenticated()) {
+    if (!authService.isStorefrontAuthenticated()) {
       localStorage.removeItem(GUEST_CART_KEY);
       setCartItems([]);
       return;
@@ -176,7 +176,7 @@ export function CartProvider({ children }) {
   }, [fetchCart]);
 
   const applyCoupon = useCallback(async (couponCode) => {
-    if (!authService.isAuthenticated()) {
+    if (!authService.isStorefrontAuthenticated()) {
       throw new Error('Please login to apply coupon');
     }
     const response = await cartService.applyCoupon(couponCode);
@@ -185,7 +185,7 @@ export function CartProvider({ children }) {
   }, [fetchCart]);
 
   const removeCoupon = useCallback(async () => {
-    if (!authService.isAuthenticated()) return;
+    if (!authService.isStorefrontAuthenticated()) return;
     await cartService.removeCoupon();
     await fetchCart();
   }, [fetchCart]);

@@ -24,6 +24,7 @@ const CustomerPage = memo(() => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -74,7 +75,7 @@ const CustomerPage = memo(() => {
     return () => {
       mounted = false;
     };
-  }, [page]);
+  }, [page, retryKey]);
 
   const requireLogin = useCallback(
     (from = "/") => {
@@ -177,7 +178,7 @@ const CustomerPage = memo(() => {
               <p className="font-black text-red-600">{error}</p>
               <button
                 type="button"
-                onClick={() => window.location.reload()}
+                onClick={() => setRetryKey((value) => value + 1)}
                 className="mt-5 rounded-full bg-teal-600 px-5 py-3 text-sm font-black text-white hover:bg-teal-700"
               >
                 Try Again

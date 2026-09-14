@@ -4,6 +4,7 @@ import { useCart } from "../../context/CartContext";
 import { useAuth } from "../../context/AuthContext";
 import { wishlistService } from "../../services/wishlist";
 import { productService } from "../../services/product";
+import { authService } from "../../services/auth";
 
 const mockSuggestions = [
   "Adult Diaper Extra Large",
@@ -43,7 +44,7 @@ export default function useNavbar() {
 
   useEffect(() => {
     const loadWishlistCount = async () => {
-      if (!isLoggedIn) {
+      if (!isLoggedIn || !authService.isStorefrontAuthenticated()) {
         setWishlistCount(0);
         return;
       }

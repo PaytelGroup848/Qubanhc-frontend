@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import useNavbar from "./useNavbar";
 import TopBar from "./TopBar";
@@ -15,6 +15,21 @@ import {
 } from "../Icons/Icons";
 import { useCart } from "../../context/CartContext";
 import { categoryService } from "../../services/category";
+import { getCategoryImage } from "../../utils/imageUrl";
+
+const categoryFallbackImages = {
+  diapers: "/images/BABY diAPER.webp",
+  "baby-diaper": "/images/BABY diAPER.webp",
+  "baby-diapers": "/images/BABY diAPER.webp",
+  wipes:
+    "/images/premium-baby-wipes-99-pure-water-aloe-vera-glycerine-with-lid-original-imahhj6nxypmgjhh.jpg",
+  "baby-wipes":
+    "/images/premium-baby-wipes-99-pure-water-aloe-vera-glycerine-with-lid-original-imahhj6nxypmgjhh.jpg",
+  "adult-diapers":
+    "/images/m-unisex-pull-up-pants-12hrs-absorption-waist-size-24-45inch-original-imahhhgs2wfdnbnb.jpg",
+  "sanitary-pads":
+    "/images/leak-proof-sanitary-pad-for-heavy-flow-with-disposable-bags-original-imahm4yxmygc5m6t (3).jpg",
+};
 
 export default function Navbar() {
   const {
@@ -39,63 +54,11 @@ export default function Navbar() {
   const [shopCategories, setShopCategories] = useState([]);
   const [shopCategoriesLoading, setShopCategoriesLoading] = useState(false);
 
-  const openTimeoutRef = useRef(null);
-  const closeTimeoutRef = useRef(null);
   const shopButtonRef = useRef(null);
   const shopPopupWrapperRef = useRef(null);
-  const isHoveringButton = useRef(false);
-  const isHoveringPopup = useRef(false);
 
-  const clearTimeouts = useCallback(() => {
-    if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-  }, []);
-
-  const openPopup = useCallback(() => {
-    clearTimeouts();
-    if (!shopPopupOpen) setShopPopupOpen(true);
-  }, [clearTimeouts, shopPopupOpen]);
-
-  const closePopupWithDelay = useCallback(() => {
-    clearTimeouts();
-    closeTimeoutRef.current = setTimeout(() => {
-      if (!isHoveringButton.current && !isHoveringPopup.current) {
-        setShopPopupOpen(false);
-      }
-    }, 200);
-  }, [clearTimeouts]);
-
-  const closePopupImmediately = useCallback(() => {
-    clearTimeouts();
-    isHoveringButton.current = false;
-    isHoveringPopup.current = false;
-    setShopPopupOpen(false);
-  }, [clearTimeouts]);
-
-  const handleButtonMouseEnter = () => {
-    isHoveringButton.current = true;
-    clearTimeouts();
-    openTimeoutRef.current = setTimeout(() => {
-      if (isHoveringButton.current) openPopup();
-    }, 150);
-  };
-
-  const handleButtonMouseLeave = () => {
-    isHoveringButton.current = false;
-    clearTimeouts();
-    closePopupWithDelay();
-  };
-
-  const handlePopupWrapperMouseEnter = () => {
-    isHoveringPopup.current = true;
-    clearTimeouts();
-  };
-
-  const handlePopupWrapperMouseLeave = () => {
-    isHoveringPopup.current = false;
-    clearTimeouts();
-    closePopupWithDelay();
-  };
+  const openPopup = () => setShopPopupOpen(true);
+  const closePopupImmediately = () => setShopPopupOpen(false);
 
   useEffect(() => {
     if (!shopPopupOpen) return;
@@ -116,10 +79,6 @@ export default function Navbar() {
       document.removeEventListener("keydown", handleEscape);
     };
   }, [shopPopupOpen, closePopupImmediately]);
-
-  useEffect(() => {
-    return () => clearTimeouts();
-  }, [clearTimeouts]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -161,7 +120,11 @@ export default function Navbar() {
   const mapCategoryForPopup = (category) => ({
     id: category._id,
     title: category.name,
-    image: category.image?.url || "/images/placeholder.jpg",
+    image:
+      categoryFallbackImages[category.slug?.toLowerCase()] ||
+      categoryFallbackImages[category.name?.toLowerCase()] ||
+      getCategoryImage(category),
+    fallbackImage: getCategoryImage(category),
     link: `/category/${category.slug}`,
     color: "from-teal-400 to-teal-600",
     children: category.children || [],
@@ -193,7 +156,7 @@ export default function Navbar() {
             <img
               src="/images/QubanHC.svg"
               alt="QubanHC Logo"
-              className="h-10 sm:h-12 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-10 sm:h-25 md:h-25 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
             {/* <div className="flex flex-col">
               <span className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight leading-none bg-gradient-to-r from-teal-600 to-emerald-500 bg-clip-text text-transparent">
@@ -210,19 +173,17 @@ export default function Navbar() {
             <li>
               <Link
                 to="/"
-                className="px-3 py-2 text-base lg:text-lg font-medium text-teal-600 bg-teal-50 rounded-md"
+                className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
               >
                 Home
               </Link>
             </li>
             <li
               ref={shopButtonRef}
-              onMouseEnter={handleButtonMouseEnter}
-              onMouseLeave={handleButtonMouseLeave}
             >
               <button
                 onClick={() => openPopup()}
-                className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 hover:text-teal-600 hover:bg-teal-50 rounded-md transition-colors"
+                className="px-3 py-2 text-base lg:text-lg font-medium text-gray-700 active:text-teal-600 active:bg-teal-50 rounded-md transition-colors"
               >
                 Shop
               </button>
@@ -329,8 +290,6 @@ export default function Navbar() {
 
       <div
         ref={shopPopupWrapperRef}
-        onMouseEnter={handlePopupWrapperMouseEnter}
-        onMouseLeave={handlePopupWrapperMouseLeave}
         style={{ position: "relative", zIndex: 50 }}
       >
         <ShopPopup

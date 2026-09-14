@@ -85,10 +85,7 @@ export default function ShopPopup({
       {/* Overlay with blur */}
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
-        onClick={() => {
-  onCategorySelect?.(cat);
-  onClose();
-}}
+          onClick={onClose}
       />
 
       {/* Popup container */}
@@ -130,12 +127,18 @@ export default function ShopPopup({
                   className="group relative flex flex-col items-center text-center transition-transform duration-200 hover:-translate-y-1"
                 >
                   <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-md ring-1 ring-black/5 group-hover:ring-2 group-hover:ring-teal-400 transition-all duration-300">
-                    {!imageErrors[cat.id] ? (
+                    {!imageErrors[cat.id] || imageErrors[cat.id] === true ? (
                       <img
-                        src={cat.image}
+                        src={imageErrors[cat.id] ? cat.fallbackImage : cat.image}
                         alt={cat.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        onError={() => handleImageError(cat.id)}
+                        onError={(event) => {
+                          if (cat.fallbackImage && event.currentTarget.src.endsWith(cat.fallbackImage)) {
+                            setImageErrors((prev) => ({ ...prev, [cat.id]: "failed" }));
+                          } else {
+                            handleImageError(cat.id);
+                          }
+                        }}
                       />
                     ) : (
                       <div className={`w-full h-full bg-gradient-to-br ${cat.color || 'from-gray-400 to-gray-600'} flex items-center justify-center`}>

@@ -1,8 +1,12 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const API_BASE_URL = "https://qubanhygienecare.com/api/v1";
-// const API_BASE_URL = "http://localhost:5000/api/v1";
+const configuredBackendUrl =
+  import.meta.env.VITE_BACKEND_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://qubanhygienecare.com";
+
+const API_BASE_URL = `${configuredBackendUrl.replace(/\/+$/, "")}/api/v1`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -99,6 +103,14 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config || {};
 
+    const isAuthRequest = /\/auth\/(login|register|verify-email|resend-otp|forgot-password|reset-password)/.test(
+      originalRequest.url || "",
+    );
+
+    if (error.response?.status === 401 && isAuthRequest) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status !== 401 || originalRequest._retry) {
       showGlobalApiErrorToast(error);
       return Promise.reject(error);
@@ -132,7 +144,8 @@ api.interceptors.response.use(
           refreshToken.trim().length > 0;
 
         if (!isValidToken) {
-          throw new Error("No refresh token available");
+          processQueue(error, null);
+          return Promise.reject(error);
         }
 
         const response = await axios.post(
@@ -162,7 +175,8 @@ api.interceptors.response.use(
 
         showGlobalApiErrorToast(refreshError);
 
-        window.location.href = "/login";
+        window.history.pushState({}, "", "/login");
+        window.dispatchEvent(new PopStateEvent("popstate"));
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

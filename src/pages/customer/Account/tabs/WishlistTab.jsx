@@ -3,6 +3,7 @@ import { Heart, ShoppingCart, Trash2, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../../../../services/api';
+import { authService } from '../../../../services/auth';
 
 export default function WishlistTab() {
     const [items, setItems] = useState([]);
@@ -12,6 +13,11 @@ export default function WishlistTab() {
     const fetchWishlist = async () => {
         try {
             setLoading(true);
+
+            if (!authService.isStorefrontAuthenticated()) {
+                setItems([]);
+                return;
+            }
 
             const res = await api.get('/wishlist');
             setItems(res.data.data.wishlist.products || []);

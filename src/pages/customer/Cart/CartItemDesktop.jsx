@@ -50,7 +50,6 @@ export default function CartItemDesktop({ item }) {
   const handleQuantityChange = (nextQuantity) => {
     updateQuantity(item.id, item.packId || item.variantId, nextQuantity);
     window.dispatchEvent(new Event("cart-changed"));
-    // window.location.reload();
   };
 
   return (

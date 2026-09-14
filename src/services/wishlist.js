@@ -1,8 +1,12 @@
 import api from './api';
+import { authService } from './auth';
 
 export const wishlistService = {
   // Get wishlist
   getWishlist: async () => {
+    if (!authService.isStorefrontAuthenticated()) {
+      return { data: { wishlist: { items: [] } } };
+    }
     const response = await api.get('/wishlist');
     return response.data;
   },

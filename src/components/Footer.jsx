@@ -269,14 +269,7 @@ export default function Footer() {
               Cookie Policy
             </Link> */}
           </div>
-          <div className="flex items-center gap-3 text-white/70">
-            <span className="text-xs font-medium tracking-wide">
-              We accept:
-            </span>
-            <span className="text-lg">💳</span>
-            <span className="text-lg">🏦</span>
-            <span className="text-lg">📱</span>
-          </div>
+          
         </div>
       </div>
     </footer>

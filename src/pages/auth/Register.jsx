@@ -132,15 +132,17 @@ export default function Register() {
         password: form.password,
       });
 
+      const otpFromResponse = res?.otp ?? res?.data?.otp ?? '';
+
       // Store for auto-login after OTP
       setRegisteredEmail(form.email.trim().toLowerCase());
       setRegisteredPassword(form.password);
       setRegisteredName(form.name.trim());
 
       // Dev mode: show OTP on screen if backend returns it
-      if (res?.data?.otp) setDevOtp(res.data.otp);
+      if (otpFromResponse) setDevOtp(otpFromResponse);
 
-      toast.success('Account created! Check your email for OTP.');
+      toast.success(res?.message || 'Account created! Check your email for OTP.');
       setShowOtpModal(true);
     } catch (err) {
       const msg = err.response?.data?.message || 'Registration failed. Please try again.';
@@ -197,8 +199,10 @@ export default function Register() {
 
     try {
       const res = await authService.resendOtp(registeredEmail);
-      if (res?.data?.otp) setDevOtp(res.data.otp);
-      toast.success('New OTP sent to your email!');
+      const otpFromResponse = res?.otp ?? res?.data?.otp ?? '';
+
+      if (otpFromResponse) setDevOtp(otpFromResponse);
+      toast.success(res?.message || 'New OTP sent to your email!');
       setOtp('');
       setOtpError('');
 
@@ -238,9 +242,16 @@ export default function Register() {
 
         {/* Brand */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-4">
-            <img src="/images/QubanHC.svg" alt="QubanHC" className="h-10 w-auto" onError={(e) => e.target.style.display='none'} />
-            <span className="text-2xl font-extrabold text-gray-800">
+          <Link to="/" className="inline-flex items-center justify-center gap-3 mb-5">
+            <div className="h-14 w-14 rounded-2xl bg-white shadow-md flex items-center justify-center">
+              <img
+                src="/images/QubanHC.svg"
+                alt="QubanHC Logo"
+                className="h-10 w-auto"
+              />
+            </div>
+
+            <span className="text-3xl font-extrabold text-gray-800">
               Quban<span className="text-teal-600">HC</span>
             </span>
           </Link>
@@ -395,12 +406,8 @@ export default function Register() {
               </p>
             </div>
 
-            {/* Dev mode OTP hint */}
-            {devOtp && (
-              <div className="mb-4 p-2.5 bg-yellow-50 border border-yellow-200 rounded-lg text-center">
-                <p className="text-xs text-yellow-700">Dev mode — OTP: <strong className="font-mono text-base">{devOtp}</strong></p>
-              </div>
-            )}
+          
+           
 
             {/* OTP Input */}
             <input

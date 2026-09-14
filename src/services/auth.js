@@ -1,53 +1,92 @@
-import api from './api';
+import axios from 'axios';
+
+const authBackendUrl = (
+  import.meta.env.VITE_AUTH_BACKEND_URL ||
+  import.meta.env.VITE_BACKEND_URL ||
+  'http://localhost:5000'
+).replace(/\/+$/, '');
+
+const authApi = axios.create({
+  baseURL: `${authBackendUrl}/api/v1`,
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+});
+
+const storefrontBackendUrl = (
+  import.meta.env.VITE_BACKEND_URL ||
+  'https://qubanhygienecare.com'
+).replace(/\/+$/, '');
+
+const usesStorefrontAuth = authBackendUrl === storefrontBackendUrl;
 
 export const authService = {
   // Register new user
  register: async (userData) => {
-  const response = await api.post('/auth/register', userData);
+  const response = await authApi.post('/auth/register', userData);
   return response.data;
 },
 
   // Login user
   login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
-    if (response.data.data?.accessToken) {
-      localStorage.setItem('accessToken', response.data.data.accessToken);
-      const rToken = response.data.data.refreshToken;
+    const response = await authApi.post('/auth/login', credentials);
+    const payload = response.data?.data || response.data || {};
+    const accessToken =
+      payload.accessToken || payload.token || payload.tokens?.accessToken;
+    const refreshToken =
+      payload.refreshToken || payload.tokens?.refreshToken;
+    const user = payload.user || response.data?.user;
+
+    if (accessToken) {
+      localStorage.setItem('accessToken', accessToken);
+      const rToken = refreshToken;
       if (rToken && rToken !== 'undefined' && rToken !== 'null') {
         localStorage.setItem('refreshToken', rToken);
       }
-      localStorage.setItem('user', JSON.stringify(response.data.data.user));
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      }
     }
-    return response.data;
+
+    return {
+      ...response.data,
+      data: {
+        ...payload,
+        accessToken,
+        refreshToken,
+        user,
+      },
+    };
   },
 
   // Verify email with OTP
   verifyEmail: async (email, otp) => {
-    const response = await api.post('/auth/verify-email', { email, otp });
+    const response = await authApi.post('/auth/verify-email', { email, otp });
     return response.data;
   },
 
   // Resend OTP
   resendOtp: async (email) => {
-    const response = await api.post('/auth/resend-otp', { email, type: 'email_verify' });
+    const response = await authApi.post('/auth/resend-otp', { email, type: 'email_verify' });
     return response.data;
   },
 
   // Get current logged in user
   getCurrentUser: async () => {
-    const response = await api.get('/auth/me');
+    const response = await authApi.get('/auth/me', {
+      headers: { Authorization: `Bearer ${authService.getToken()}` },
+    });
     return response.data;
   },
 
   // Forgot password - send OTP
   forgotPassword: async (email) => {
-    const response = await api.post('/auth/forgot-password', { email });
+    const response = await authApi.post('/auth/forgot-password', { email });
     return response.data;
   },
 
   // Reset password with OTP
   resetPassword: async (email, otp, newPassword, confirmPassword) => {
-    const response = await api.post('/auth/reset-password', {
+    const response = await authApi.post('/auth/reset-password', {
       email,
       otp,
       newPassword,
@@ -58,7 +97,7 @@ export const authService = {
 
   // Refresh token
   refreshToken: async (refreshToken) => {
-    const response = await api.post('/auth/refresh-token', { refreshToken });
+    const response = await authApi.post('/auth/refresh-token', { refreshToken });
     if (response.data.data?.accessToken) {
       localStorage.setItem('accessToken', response.data.data.accessToken);
     }
@@ -68,21 +107,25 @@ export const authService = {
   // Logout user
   logout: async () => {
     try {
-      await api.post('/auth/logout');
+      await authApi.post('/auth/logout', null, {
+        headers: { Authorization: `Bearer ${authService.getToken()}` },
+      });
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       authService.clearAuthData();
       sessionStorage.clear();
       window.dispatchEvent(new Event('auth-changed'));
-      window.location.href = '/login';
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
     }
   },
 
   // Check if user is authenticated
   isAuthenticated: () => {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-    if (!token) return false;
+    const user = authService.getUser();
+    if (!token || !user) return false;
 
     // Check if token is expired
     try {
@@ -91,15 +134,17 @@ export const authService = {
       const currentTime = Date.now();
 
       if (expiryTime < currentTime) {
-        // Token expired, clear storage
-        authService.clearAuthData();
-        return false;
+        // Keep the persisted session alive while the refresh token is available.
+        return Boolean(authService.getRefreshToken());
       }
       return true;
     } catch (e) {
       return false;
     }
   },
+
+  isStorefrontAuthenticated: () =>
+    usesStorefrontAuth && authService.isAuthenticated(),
 
   // Get user from localStorage
   getUser: () => {
@@ -213,7 +258,8 @@ export const authService = {
         console.error('Auto refresh failed:', error);
         authService.clearAuthData();
         sessionStorage.clear();
-        window.location.href = '/login';
+        window.history.pushState({}, '', '/login');
+        window.dispatchEvent(new PopStateEvent('popstate'));
         return false;
       }
     }

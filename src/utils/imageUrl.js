@@ -6,6 +6,7 @@ const BACKEND_URL =
 export const getImageUrl = (url) => {
   if (!url) return "/images/placeholder.jpg";
   if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  if (url.startsWith("/images/") || url.startsWith("data:")) return url;
   if (url.startsWith("/uploads")) return `${BACKEND_URL}${url}`;
   return "/images/placeholder.jpg";
 };
@@ -17,5 +18,7 @@ export const getProductImage = (product) => {
 };
 
 export const getCategoryImage = (category) => {
-  return getImageUrl(category?.image?.url);
+  const image = category?.image;
+  const imageUrl = typeof image === "string" ? image : image?.url;
+  return getImageUrl(imageUrl);
 };

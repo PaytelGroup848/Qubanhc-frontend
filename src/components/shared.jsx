@@ -32,13 +32,15 @@ export function SkeletonTable() {
   );
 }
 
-export function ErrorState({ message }) {
+export function ErrorState({ message, onRetry }) {
   return (
     <div className="text-center py-12">
       <p className="text-red-500">{message}</p>
-      <button onClick={() => window.location.reload()} className="mt-4 text-orange-500 hover:underline">
-        Try again
-      </button>
+      {onRetry && (
+        <button onClick={onRetry} className="mt-4 text-orange-500 hover:underline">
+          Try again
+        </button>
+      )}
     </div>
   );
 }

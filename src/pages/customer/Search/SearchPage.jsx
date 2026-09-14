@@ -47,6 +47,7 @@ export default function SearchPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [retryKey, setRetryKey] = useState(0);
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -105,7 +106,7 @@ export default function SearchPage() {
     return () => {
       mounted = false;
     };
-  }, [query, page]);
+  }, [query, page, retryKey]);
 
   const requireLogin = useCallback(
     (from = "/") => {
@@ -225,7 +226,7 @@ export default function SearchPage() {
             <p className="font-black text-red-600">{error}</p>
             <button
               type="button"
-              onClick={() => window.location.reload()}
+              onClick={() => setRetryKey((value) => value + 1)}
               className="mt-5 rounded-full bg-[#7f1d1d] px-5 py-3 text-sm font-black text-white transition hover:bg-[#641515]"
             >
               Try Again
